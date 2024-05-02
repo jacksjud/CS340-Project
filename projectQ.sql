@@ -3,11 +3,18 @@ CREATE OR REPLACE TABLE Investors (
     name varchar(50) NOT NULL
 );
 
+<<<<<<< Updated upstream
 
 CREATE OR REPLACE TABLE Stocks (
     stockID int unique NOT NULL AUTO_INCREMENT PRIMARY KEY,
     symbol varchar(256) NOT NULL,
     companyName varchar(256) NOT NULL
+=======
+create or replace table Stocks (
+    stockID int unique not NULL AUTO_INCREMENT PRIMARY KEY,
+    symbol varchar(256) unique not NULL,
+    companyName varchar(256) not NULL
+>>>>>>> Stashed changes
 );
 
 
@@ -27,7 +34,11 @@ CREATE OR REPLACE TABLE Investments (
     investID int unique NOT NULL AUTO_INCREMENT PRIMARY KEY,
     stockID int,
     investorID int,
+<<<<<<< Updated upstream
     date date NOT NULL,
+=======
+    date date not NULL,
+>>>>>>> Stashed changes
     FOREIGN KEY (stockID) REFERENCES Stocks(stockID),
     FOREIGN KEY (investorID) REFERENCES Investors(investorID)
 );
@@ -37,8 +48,13 @@ CREATE OR REPLACE TABLE InvestedStocks (
     investedStockID int unique NOT NULL AUTO_INCREMENT PRIMARY KEY,
     stockID int,
     investID int,
+<<<<<<< Updated upstream
     quantity int NOT NULL,
     investment decimal(19,2) NOT NULL,
+=======
+    quantity int not NULL,
+    investment decimal(19,2) not NULL,
+>>>>>>> Stashed changes
     FOREIGN KEY (stockID) REFERENCES Stocks(stockID),
     FOREIGN KEY (investID) REFERENCES Investments(investID)
 );
@@ -83,6 +99,7 @@ VALUES
 ('Christina P.');
 
 -- Investments
+<<<<<<< Updated upstream
 INSERT INTO Investments (
     InvestorID,
     Date
@@ -98,6 +115,19 @@ VALUES
 (8, '2024-04-03'),
 (1, '2024-04-14'),
 (6, '2024-12-04');
+=======
+INSERT INTO Investments (InvestorID, stockID, Date) VALUES
+(5, 1, '2024-01-01'),
+(7, 3,'2024-01-05'),
+(2, 4,'2024-02-14'),
+(5, 3,'2024-02-20'),
+(2, 2,'2024-02-20'),
+(4, 6,'2024-03-04'),
+(6, 5,'2024-03-04'),
+(8, 2,'2024-04-03'),
+(1, 3,'2024-04-14'),
+(6, 5,'2024-12-04');
+>>>>>>> Stashed changes
 
 -- Changes
 INSERT INTO Changes (
@@ -131,6 +161,7 @@ VALUES
 (6, 3, 200, 10000.00),
 (5, 4, 150, 7500.00);
 
+<<<<<<< Updated upstream
 -- Show all the beautiful data in it's entirety.
 SHOW TABLES;
 DESCRIBE Investors;
@@ -148,3 +179,16 @@ SELECT * FROM InvestedStocks;
 SET FOREIGN_KEY_CHECKS=0;
 DROP TABLE Investors, Stocks, Changes, Investments, InvestedStocks; 
 SHOW TABLES;
+=======
+
+SELECT * FROM Changes;
+SELECT * FROM InvestedStocks;
+SELECT * FROM Investments;
+SELECT * FROM Investors;
+SELECT * FROM Stocks;
+
+-- Now delete all the beautiful data in it's entirety.
+SET FOREIGN_KEY_CHECKS=0;
+DROP TABLE Investors, Stocks, Changes, Investments, InvestedStocks;
+SHOW TABLES;
+>>>>>>> Stashed changes
