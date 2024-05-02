@@ -1,3 +1,6 @@
+SET FOREIGN_KEY_CHECKS=0;
+SET AUTOCOMMIT = 0;
+
 CREATE OR REPLACE TABLE Investors (
     investorID int unique NOT NULL AUTO_INCREMENT PRIMARY KEY,
     name varchar(50) NOT NULL
@@ -77,7 +80,7 @@ CREATE OR REPLACE TABLE InvestedStocks (
 INSERT INTO Stocks (
     symbol,
     companyName
-) 
+)
 VALUES
 ('AAPL', 'Apple Inc.'),
 ('BA', 'The Boeing Company'),
@@ -89,7 +92,7 @@ VALUES
 -- Investors
 INSERT INTO Investors (
     name
-) 
+)
 VALUES
 ('Michael Jackson'),
 ('Kobe Bryant'),
@@ -103,7 +106,7 @@ VALUES
 INSERT INTO Investments (
     InvestorID,
     Date
-) 
+)
 VALUES
 (5, '2024-01-01'),
 (7, '2024-01-05'),
@@ -137,7 +140,7 @@ INSERT INTO Changes (
     priceHigh,
     priceLow,
     Date
-) 
+)
 VALUES
 (1, 180.01, 190.34, 194.20, 178.23, '2024-02-20'),
 (6, 123.45, 101.32, 123.45, 101.32, '2024-04-03'),
@@ -153,7 +156,7 @@ INSERT INTO InvestedStocks (
     investID,
     quantity,
     investment
-) 
+)
 VALUES
 (1, 1, 100, 5000.00),
 (3, 1, 50, 3000.00),
@@ -177,7 +180,7 @@ SELECT * FROM InvestedStocks;
 
 -- Now delete all the beautiful data in it's entirety.
 SET FOREIGN_KEY_CHECKS=0;
-DROP TABLE Investors, Stocks, Changes, Investments, InvestedStocks; 
+DROP TABLE Investors, Stocks, Changes, Investments, InvestedStocks;
 SHOW TABLES;
 =======
 
@@ -187,8 +190,12 @@ SELECT * FROM Investments;
 SELECT * FROM Investors;
 SELECT * FROM Stocks;
 
+
 -- Now delete all the beautiful data in it's entirety.
-SET FOREIGN_KEY_CHECKS=0;
+-- DISABLE (comment out) if you want to keep tables for testing/grading. Simply here for convenience.
 DROP TABLE Investors, Stocks, Changes, Investments, InvestedStocks;
 SHOW TABLES;
+
+SET FOREIGN_KEY_CHECKS=1;
+COMMIT;
 >>>>>>> Stashed changes
