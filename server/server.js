@@ -25,36 +25,13 @@ app.get("/", function(req, res) {
     })
 })
 
-app.get("/investors", function(req, res) {
-    res.render('investors', {
-
+app.get("/edit/:table", function(req, res) {
+    console.log("param name being passed: ",  req.params.table)
+    res.render( 'editor', { 
+        body: req.params.table
     })
 })
 
-app.get("/stocks", function(req, res) {
-    res.render('stocks', {
-
-    })
-})
-
-app.get("/changes", function(req, res) {
-    res.render('/lists/changes.handlebars', {
-
-    })
-})
-
-
-app.get("/investments", function(req, res) {
-    res.render('investments', {
-
-    })
-})
-
-app.get("/investedStocks", function(req, res) {
-    res.render('investments', {
-
-    })
-})
 
 app.get('*', function (req, res) {
     res.render('404')
