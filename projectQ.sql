@@ -6,18 +6,11 @@ CREATE OR REPLACE TABLE Investors (
     name varchar(50) NOT NULL
 );
 
-<<<<<<< Updated upstream
 
 CREATE OR REPLACE TABLE Stocks (
     stockID int unique NOT NULL AUTO_INCREMENT PRIMARY KEY,
     symbol varchar(256) NOT NULL,
     companyName varchar(256) NOT NULL
-=======
-create or replace table Stocks (
-    stockID int unique not NULL AUTO_INCREMENT PRIMARY KEY,
-    symbol varchar(256) unique not NULL,
-    companyName varchar(256) not NULL
->>>>>>> Stashed changes
 );
 
 
@@ -37,11 +30,7 @@ CREATE OR REPLACE TABLE Investments (
     investID int unique NOT NULL AUTO_INCREMENT PRIMARY KEY,
     stockID int,
     investorID int,
-<<<<<<< Updated upstream
     date date NOT NULL,
-=======
-    date date not NULL,
->>>>>>> Stashed changes
     FOREIGN KEY (stockID) REFERENCES Stocks(stockID),
     FOREIGN KEY (investorID) REFERENCES Investors(investorID)
 );
@@ -51,13 +40,8 @@ CREATE OR REPLACE TABLE InvestedStocks (
     investedStockID int unique NOT NULL AUTO_INCREMENT PRIMARY KEY,
     stockID int,
     investID int,
-<<<<<<< Updated upstream
     quantity int NOT NULL,
     investment decimal(19,2) NOT NULL,
-=======
-    quantity int not NULL,
-    investment decimal(19,2) not NULL,
->>>>>>> Stashed changes
     FOREIGN KEY (stockID) REFERENCES Stocks(stockID),
     FOREIGN KEY (investID) REFERENCES Investments(investID)
 );
