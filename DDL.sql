@@ -2,7 +2,6 @@
 -- Judah Jackson
 -- Gabriele Falchini
 
-
 SET FOREIGN_KEY_CHECKS=0;
 SET AUTOCOMMIT = 0;
 
@@ -13,12 +12,11 @@ CREATE OR REPLACE TABLE Investors (
     name varchar(50) NOT NULL
 );
 
-create or replace table Stocks (
+CREATE OR REPLACE TABLE Stocks (
     stockID int unique not NULL AUTO_INCREMENT PRIMARY KEY,
     symbol varchar(256) unique not NULL,
     companyName varchar(256) not NULL
 );
-
 
 CREATE OR REPLACE TABLE Changes (
     changeID int unique NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -31,14 +29,12 @@ CREATE OR REPLACE TABLE Changes (
     FOREIGN KEY (stockID) REFERENCES Stocks(stockID)
 );
 
-
 CREATE OR REPLACE TABLE Investments (
     investID int unique NOT NULL AUTO_INCREMENT PRIMARY KEY,
     investorID int,
     date date NOT NULL,
     FOREIGN KEY (investorID) REFERENCES Investors(investorID)
 );
-
 
 CREATE OR REPLACE TABLE InvestedStocks (
     investedStockID int unique NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -79,7 +75,11 @@ VALUES
 ('Christina P.');
 
 -- Investments
-INSERT INTO Investments (InvestorID,  Date) VALUES
+INSERT INTO Investments (
+    InvestorID,
+    date
+) 
+VALUES
 (5,  '2024-01-01'),
 (7, '2024-01-05'),
 (2, '2024-02-14'),
@@ -98,7 +98,7 @@ INSERT INTO Changes (
     priceClose,
     priceHigh,
     priceLow,
-    Date
+    date
 )
 VALUES
 (1, 180.01, 190.34, 194.20, 178.23, '2024-02-20'),
@@ -124,6 +124,7 @@ VALUES
 (5, 4, 150, 7500.00);
 
 
+
 -- Show all the beautiful data in it's entirety.
 SHOW TABLES;
 DESCRIBE Investors;
@@ -136,7 +137,6 @@ DESCRIBE Investments;
 SELECT * FROM Investments;
 DESCRIBE InvestedStocks;
 SELECT * FROM InvestedStocks;
-
 
 -- Now delete all the beautiful data in it's entirety.
 -- DISABLE (comment out) if you want to keep tables for testing/grading. Simply here for convenience.
