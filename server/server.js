@@ -17,7 +17,7 @@ app.use(express.static('static', { index: false }))
 // Use handlebars
 app.engine('handlebars', hb_adapter.engine({ defaultLayout: "main" }))   // sets up template engine (handlebars)
 app.set('view engine', 'handlebars')            // sets up view engine 
-app.set('views', './views/handlebars')                     // registers where templates are
+app.set('views', './views')                     // registers where templates are
 
 app.get("/", function(req, res) {
     res.render('body', {
@@ -38,7 +38,7 @@ app.get("/stocks", function(req, res) {
 })
 
 app.get("/changes", function(req, res) {
-    res.render('changes', {
+    res.render('/lists/changes.handlebars', {
 
     })
 })
@@ -51,9 +51,18 @@ app.get("/investments", function(req, res) {
 })
 
 app.get("/investedStocks", function(req, res) {
-    res.render('investedStocks', {
+    res.render('investments', {
 
     })
+})
+
+app.get('*', function (req, res) {
+    res.render('404')
+})
+
+// Listen on port
+app.listen(port, function () {
+    console.log("== Server is listening on port", port)
 })
 
 
