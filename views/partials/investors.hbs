@@ -1,0 +1,26 @@
+<h2>Investors</h2>
+{{!-- Create a table --}}
+<table>
+    {{!-- Header section --}}
+    <thead>
+        {{!-- For just the first row, we print each key of the row object as a header cell so we
+        know what each column means when the page renders --}}
+        <tr>
+            {{#each data.[0]}}
+            <th>
+                {{@key}}
+            </th>
+            {{/each}}
+        </tr>
+    </thead>
+    {{!-- Body section --}}
+    <tbody>
+        {{!-- For each row, print the investorID and name in order --}}
+        {{#each data}}
+        <tr>
+            <td>{{this.investorID}}</td>
+            <td>{{this.name}}</td>
+        </tr>
+        {{/each}}
+    </tbody>
+</table>
