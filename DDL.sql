@@ -27,14 +27,14 @@ CREATE OR REPLACE TABLE Changes (
     priceHigh  decimal (19,2) NOT NULL,
     priceLow  decimal (19,2) NOT NULL,
     date date NOT NULL,
-    FOREIGN KEY (stockID) REFERENCES Stocks(stockID)
+    FOREIGN KEY (stockID) REFERENCES Stocks(stockID) ON DELETE CASCADE
 );
 
 CREATE OR REPLACE TABLE Investments (
     investID int unique NOT NULL AUTO_INCREMENT PRIMARY KEY,
     investorID int,
     date date NOT NULL,
-    FOREIGN KEY (investorID) REFERENCES Investors(investorID)
+    FOREIGN KEY (investorID) REFERENCES Investors(investorID) ON DELETE CASCADE
 );
 
 CREATE OR REPLACE TABLE InvestedStocks (
@@ -43,8 +43,8 @@ CREATE OR REPLACE TABLE InvestedStocks (
     investID int,
     quantity int NOT NULL,
     investment decimal(19,2) NOT NULL,
-    FOREIGN KEY (stockID) REFERENCES Stocks(stockID),
-    FOREIGN KEY (investID) REFERENCES Investments(investID)
+    FOREIGN KEY (stockID) REFERENCES Stocks(stockID) ON DELETE CASCADE,
+    FOREIGN KEY (investID) REFERENCES Investments(investID) ON DELETE CASCADE
 );
 
 
