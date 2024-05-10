@@ -1,6 +1,10 @@
+-- Group: 95
+-- Team Members:
+-- Gabriele Falchini
+-- Judah Jackson
+
 -- These are some Database Manipulation queries for our partially implemented Project Website 
--- using the bsg database.
--- for the 14 requiered functions we need 5 SELECTs, 5 INSERTs, 1 UPDATE, 1 DELETE, 1 Dynamic drop-down/search.
+-- For the 14 requiered functions we need 5 SELECTs, 5 INSERTs, 1 UPDATE, 1 DELETE, 1 Dynamic drop-down/search.
 
 
 ---- SELECTS ----
@@ -22,6 +26,34 @@ SELECT investedStockID, stockID, investID, quantitiy, investment FROM Investedst
 
 
 ---- INSERTS ----
+
+-- add any new companies to the stock market table
+INSERT INTO Stocks (
+    symbol,
+    companyName
+)
+VALUES (
+    :symbol_Input,
+    :name_Input
+)
+
+-- add price changes of a stock in a given date
+INSERT INTO Changes (
+    stockID,
+    priceOpen,
+    priceClose,
+    priceHigh,
+    priceLow,
+    date
+)
+VALUES (
+    :stock_ID_from_dropdown_Input,
+    :open_price_input,
+    :close_price_input,
+    :high_price_input,
+    :low_price_input,
+    :date_Input
+)
 
 -- add a new Investor
 INSERT INTO Investors (
@@ -57,7 +89,6 @@ VALUES
     :quantity_Input,
     :investment_Input
 )
-
 
 ---- UPDATES ----
 
