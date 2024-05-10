@@ -1,11 +1,29 @@
-<h2>Invested Stocks</h2>
+<h2>Invested Stocks Page</h2>
+{{!-- Create a table --}}
 <table>
-  <tr>
-    <th>Invested Stock ID</th>
-    <th>Stock ID</th>
-    <th>Investment ID</th>
-    <th>Quantity</th>
-    <th>Investment</th>
-  </tr>
-  <!-- Add PHP or any server-side scripting language to fetch and display data from the InvestedStocks table -->
+    {{!-- Header section --}}
+    <thead>
+        {{!-- For just the first row, we print each key of the row object as a header cell so we
+        know what each column means when the page renders --}}
+        <tr>
+            {{#each data.[0]}}
+            <th>
+                {{@key}}
+            </th>
+            {{/each}}
+        </tr>
+    </thead>
+    {{!-- Body section --}}
+    <tbody>
+        {{!-- For each row, print the investedStockID, stockID, investID, quantity and investment in order --}}
+        {{#each data}}
+        <tr>
+            <td>{{this.investedStockID}}</td>
+            <td>{{this.stockID}}</td>
+            <td>{{this.investID}}</td>
+            <td>{{this.quantity}}</td>
+            <td>{{this.investment}}</td>
+        </tr>
+        {{/each}}
+    </tbody>
 </table>

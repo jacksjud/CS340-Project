@@ -35,7 +35,6 @@ app.get('/edit/investors', function (req, res) {
     let query1 = "SELECT * FROM Investors;";               // Define our query
     db.pool.query(query1, function(error, rows, fields){   // Execute the query
         res.render('partials/investors', {data: rows});    // Render the /partials/stocks.hbs file, and also send the renderer
-        console.log({data: rows});
     })                                                     // an object where 'data' is equal to the 'rows' we
 })
 

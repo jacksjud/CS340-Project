@@ -125,8 +125,9 @@ VALUES
 (5, 4, 150, 7500.00);
 
 
+---- DISABLED (remove from comments) if you want to keep tables for testing/grading. Simply here for convenience.
+---- Show all the beautiful data in it's entirety.
 
--- -- Show all the beautiful data in it's entirety.
 -- SHOW TABLES;
 -- DESCRIBE Investors;
 -- SELECT * FROM Investors;
@@ -139,10 +140,10 @@ VALUES
 -- DESCRIBE InvestedStocks;
 -- SELECT * FROM InvestedStocks;
 
--- -- Now delete all the beautiful data in it's entirety.
--- -- DISABLE (comment out) if you want to keep tables for testing/grading. Simply here for convenience.
+---- Now delete all the beautiful data in it's entirety.
+
 -- DROP TABLE Investors, Stocks, Changes, Investments, InvestedStocks;
 -- SHOW TABLES;
 
--- SET FOREIGN_KEY_CHECKS=1;
--- COMMIT;
+SET FOREIGN_KEY_CHECKS=1;
+COMMIT;

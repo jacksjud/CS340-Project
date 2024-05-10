@@ -1,10 +1,27 @@
-<h2>Investments</h2>
+<h2>Investments Page</h2>
+{{!-- Create a table --}}
 <table>
-  <tr>
-    <th>Investment ID</th>
-    <th>Stock ID</th>
-    <th>Investor ID</th>
-    <th>Date</th>
-  </tr>
-  <!-- Add PHP or any server-side scripting language to fetch and display data from the Investments table -->
+    {{!-- Header section --}}
+    <thead>
+        {{!-- For just the first row, we print each key of the row object as a header cell so we
+        know what each column means when the page renders --}}
+        <tr>
+            {{#each data.[0]}}
+            <th>
+                {{@key}}
+            </th>
+            {{/each}}
+        </tr>
+    </thead>
+    {{!-- Body section --}}
+    <tbody>
+        {{!-- For each row, print the investID, investorID and date in order --}}
+        {{#each data}}
+        <tr>
+            <td>{{this.investID}}</td>
+            <td>{{this.investorID}}</td>
+            <td>{{this.date}}</td>
+        </tr>
+        {{/each}}
+    </tbody>
 </table>

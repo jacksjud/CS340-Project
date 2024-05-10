@@ -15,11 +15,12 @@
     </thead>
     {{!-- Body section --}}
     <tbody>
-        {{!-- For each row, print the investorID and name in order --}}
+        {{!-- For each row, print the stockID, symbol and companyName in order --}}
         {{#each data}}
         <tr>
-            <td>{{this.investorID}}</td>
-            <td>{{this.name}}</td>
+            <td>{{this.stockID}}</td>
+            <td>{{this.symbol}}</td>
+            <td>{{this.companyName}}</td>
         </tr>
         {{/each}}
     </tbody>
