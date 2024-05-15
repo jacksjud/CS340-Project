@@ -1,0 +1,21 @@
+{{!-- Eventually used when we can use the server to get sql data etc. --}}
+
+{{!-- This would be the table name --}}
+<h2>{{title}}</h2>
+<table>
+    {{!-- This would be the first row that would have the names of the attributes (potentially could be mixed with below) --}}
+  <tr>
+    {{#each attributes}}
+        <th>{{attr}}</th>
+    {{/each}}
+  </tr>
+  {{!-- This would be the input data , like dummy data in the DB for example. --}}
+  {{#each inputs}}
+    <tr>
+    {{#each inputData}}
+        <th>{{data}}</th>
+    {{/each}}
+  </tr>
+  {{/each}}
+  <!-- Add PHP or any server-side scripting language to fetch and display data from the Investors table -->
+</table>
