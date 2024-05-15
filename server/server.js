@@ -4,8 +4,14 @@ const handlebars = require("handlebars")
 const hb_adapter = require('express-handlebars');
 const express = require('express')
 const connection = require('mysql')
+var db = require('./db-connector')
 
 require('dotenv').config()
+
+const host = process.env.HOST
+const user = process.env.USER
+const sqlpass = process.env.MYSQLPASS
+const database = process.env.DB
 
 // Create the express server
 var app = express()
@@ -18,6 +24,23 @@ app.use(express.static('static', { index: false }))
 app.engine('handlebars', hb_adapter.engine({ defaultLayout: "main" }))   // sets up template engine (handlebars)
 app.set('view engine', 'handlebars')            // sets up view engine 
 app.set('views', './views')                     // registers where templates are
+
+// Potential function for queries - prototype
+async function queryConnection(some, table){
+    const connection = mysql.createConnection({
+        host: host,
+        user: user,
+        password: sqlpass,
+        database: database
+      });
+      
+    connection.query('SELECT * FROM '+table, (error, results, fields) => {
+    if (error) throw error;
+    console.log('results: ', results);
+    });
+    
+    connection.end();
+}
 
 app.get("/", function(req, res) {
     res.render('body', {
