@@ -1,21 +1,31 @@
-{{!-- Eventually used when we can use the server to get sql data etc. --}}
+{{!-- Eventually used when we can use the server to get SQL data, etc. --}}
 
 {{!-- This would be the table name --}}
-<h2>{{title}}</h2>
+<h1>{{title}}</h1>
+
 <table>
     {{!-- This would be the first row that would have the names of the attributes (potentially could be mixed with below) --}}
-  <tr>
-    {{#each attributes}}
-        <th>{{attr}}</th>
-    {{/each}}
-  </tr>
-  {{!-- This would be the input data , like dummy data in the DB for example. --}}
-  {{#each inputs}}
     <tr>
-    {{#each inputData}}
-        <th>{{data}}</th>
+        {{#each attributes}}
+            <th>{{this}}</th>
+        {{/each}}
+    </tr>
+
+    {{!-- This would be the input data, like dummy data in the DB for example. --}}
+    {{#each inputs}}
+        
+        <tr>
+            {{#each this}}
+                <td>{{this}}</td>
+            {{/each}}
+                <td>
+                    {{!-- <button >Update</button> --}}
+                    <button class="delete-button">Delete</button>
+                </td>
+        </tr>
     {{/each}}
-  </tr>
-  {{/each}}
-  <!-- Add PHP or any server-side scripting language to fetch and display data from the Investors table -->
+
+
+
+    <!-- Add PHP or any server-side scripting language to fetch and display data from the Investors table -->
 </table>

@@ -3,15 +3,12 @@ const path = require('path');
 const handlebars = require("handlebars")
 const hb_adapter = require('express-handlebars');
 const express = require('express')
-const connection = require('mysql')
-var db = require('./db-connector')
-
+const mysql = require('mysql')
+const db = require('./database/db-connector');
+const quick = require('./database/db-quick');
+const { table } = require('console');
 require('dotenv').config()
 
-const host = process.env.HOST
-const user = process.env.USER
-const sqlpass = process.env.MYSQLPASS
-const database = process.env.DB
 
 // Create the express server
 var app = express()
@@ -25,21 +22,53 @@ app.engine('handlebars', hb_adapter.engine({ defaultLayout: "main" }))   // sets
 app.set('view engine', 'handlebars')            // sets up view engine 
 app.set('views', './views')                     // registers where templates are
 
-// Potential function for queries - prototype
-async function queryConnection(some, table){
-    const connection = mysql.createConnection({
-        host: host,
-        user: user,
-        password: sqlpass,
-        database: database
-      });
-      
-    connection.query('SELECT * FROM '+table, (error, results, fields) => {
-    if (error) throw error;
-    console.log('results: ', results);
+const dbTablePKs = {
+    "Investors":"investorID",
+    "Stocks":"stockID",
+    "Changes":"changeID",
+    "Investments": "investID",
+    "InvestedStocks": "investedStockID"
+}
+
+
+// const testDatabaseConnection = async () => {
+//     // Create a connection pool using environment variables
+//     const pool = mysql.createPool({
+//         connectionLimit: 10,
+//         host: process.env.HOST,
+//         user: user,
+//         password: process.env.MYSQLPASS,
+//         database: process.env.DB
+//     });
+
+//     // Attempt to connect to the database
+//     pool.getConnection((err, connection) => {
+//         if (err) {
+//             console.error('Error connecting to database:', err.message);
+//             return;
+//         }
+
+//         console.log('Database connected successfully!');
+//         connection.release(); // Release the connection back to the pool
+//     });
+// };
+
+// Call the function to test the database connection
+// testDatabaseConnection();
+
+
+function formatData(results){
+    return results.map(row => {
+        // Extract data from each row
+        const data = {};
+        for (const key in row) {
+            if (row.hasOwnProperty(key)) {
+                const capKey = key.charAt(0).toUpperCase() + key.slice(1);
+                data[capKey] = row[key];
+            }
+        }
+        return data;
     });
-    
-    connection.end();
 }
 
 app.get("/", function(req, res) {
@@ -48,12 +77,60 @@ app.get("/", function(req, res) {
     })
 })
 
-app.get("/edit/:table", function(req, res) {
-    console.log("param name being passed: ",  req.params.table)
-    res.render( 'editor', { 
-        body: req.params.table
-    })
+app.get("/tables/:table", async function(req, res) {
+    const tableName = req.params.table;
+    const table = tableName.charAt(0).toUpperCase() + tableName.slice(1);
+    const querySelect = `SELECT * FROM ${table};`
+    quick.connect.query(querySelect, (error, results, fields) => {
+        if (error) throw error;
+        // console.log('results: ', results);
+        // console.log(formatData(results));
+        const newObjects = formatData(results);
+
+        res.render('editor', {
+            body: "table",
+            title: table,
+            attributes: Object.keys(newObjects[0]),
+            inputs: Object.values(newObjects)
+        });
+    });
 })
+
+app.get('/delete/row', function(req, res) {
+    const { table, row } = req.query;
+    console.log("table, row: ", table, row);
+
+    // Disable foreign key checks
+    quick.connect.query('SET foreign_key_checks = 0', function(error) {
+        if (error) {
+            console.error('Error disabling foreign key checks:', error);
+            res.json({ status: false, error: 'Error disabling foreign key checks' });
+            return;
+        }
+
+        // Perform the DELETE operation
+        const queryDelete = `DELETE FROM ${table} WHERE ${dbTablePKs[table]} = ${row}`;
+        quick.connect.query(queryDelete, function(error, fields) {
+            // Re-enable foreign key checks
+            quick.connect.query('SET foreign_key_checks = 1', function(err) {
+                if (err) {
+                    console.error('Error enabling foreign key checks:', err);
+                    res.json({ status: false, error: 'Error enabling foreign key checks' });
+                    return;
+                }
+
+                if (error) {
+                    console.error('Error deleting row:', error);
+                    res.json({ status: false, error: 'Error deleting row' });
+                } else {
+                    res.json({ status: true });
+                }
+            });
+        });
+    });
+});
+
+
 
 
 app.get('*', function (req, res) {
