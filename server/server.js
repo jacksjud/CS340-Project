@@ -9,6 +9,8 @@ const quick = require('./database/db-quick');
 const { table } = require('console');
 require('dotenv').config()
 
+const replacementQueries = require('./replaceData.json')
+
 
 // Create the express server
 var app = express()
@@ -85,14 +87,22 @@ app.get("/tables/:table", async function(req, res) {
         if (error) throw error;
         // console.log('results: ', results);
         // console.log(formatData(results));
-        const newObjects = formatData(results);
 
-        res.render('editor', {
-            body: "table",
-            title: table,
-            attributes: Object.keys(newObjects[0]),
-            inputs: Object.values(newObjects)
-        });
+        if(results.length === 0){
+            res.render('editor', {
+                body: "table",
+                title: table
+            });
+        } else {
+            const newObjects = formatData(results);
+
+            res.render('editor', {
+                body: "table",
+                title: table,
+                attributes: Object.keys(newObjects[0]),
+                inputs: Object.values(newObjects)
+            });
+        }
     });
 })
 
@@ -130,6 +140,47 @@ app.get('/delete/row', function(req, res) {
     });
 });
 
+
+app.get("/replace/:table", function (req, res) {
+    // Disable foreign key checks
+    db.pool.query('SET foreign_key_checks = 0;', function(error) {
+        if (error) {
+            console.error('Error disabling foreign key checks:', error);
+            res.json({ status: false, error: 'Error disabling foreign key checks;' });
+            return;
+        }
+
+        // Execute the replacement query
+        const queryUpdate = replacementQueries[req.params.table];
+        db.pool.query(queryUpdate, function(error, results) {
+            if (error) {
+                console.error('Error replacing table:', error);
+                res.json({ status: false, error: 'Error replacing table' });
+                return;
+            }
+
+            // Commit the transaction
+            db.pool.query('COMMIT;', function(err) {
+                if (err) {
+                    console.error('Error committing transaction:', err);
+                    res.json({ status: false, error: 'Error committing transaction' });
+                    return;
+                }
+
+                // Enable foreign key checks
+                db.pool.query('SET foreign_key_checks = 1;', function(err) {
+                    if (err) {
+                        console.error('Error enabling foreign key checks:', err);
+                        res.json({ status: false, error: 'Error enabling foreign key checks' });
+                        return;
+                    }
+
+                    res.json({ status: true });
+                });
+            });
+        });
+    });
+});
 
 
 

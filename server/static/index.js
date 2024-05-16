@@ -44,5 +44,30 @@ function createRow(event){
 
 }
 
-const replaceButton = document.getElementById("replace-row-button");
+const replaceButton = document.querySelectorAll("#replace-table-button");
+replaceButton.forEach(button => {
+    button.addEventListener('click', replaceTables);
+    console.log("event listener added")
+});
 
+// replaceTables();
+
+function replaceTables(event){
+    const tableToReplace = document.querySelector('h1').textContent;
+    console.log(tableToReplace);
+    fetch(`/replace/${tableToReplace}/`)
+        .then(response => response.json())
+        .then(data => {
+            const response = data["status"];
+            if(response){
+                console.log("Table replaced")
+                location.reload();
+            } else {
+                console.error("Failed to replace table");
+                alert("Unable to replace table!")
+            }
+        })
+        .catch(error => {
+            console.error("ERROR: " , error)
+        });
+}
