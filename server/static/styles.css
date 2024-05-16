@@ -43,3 +43,8 @@ nav ul li a {
 nav ul li a:hover {
     text-decoration: underline; /* Underline link on hover */
 }
+
+/* Form Styles */
+form {
+    margin-top: 20px;
+}

@@ -12,20 +12,23 @@
     </tr>
 
     {{!-- This would be the input data, like dummy data in the DB for example. --}}
-    {{#each inputs}}
-        
-        <tr>
-            {{#each this}}
-                <td>{{this}}</td>
-            {{/each}}
-                <td>
-                    {{!-- <button >Update</button> --}}
-                    <button class="delete-button">Delete</button>
-                </td>
-        </tr>
+    {{#each inputs}}    
+    <tr>
+        {{#each this}}
+            <td>{{this}}</td>
+        {{/each}}
+            <td>
+                {{!-- <button class="update-button">Update</button> --}}
+                <button class="delete-button">Delete</button>
+            </td>
+    </tr>
     {{/each}}
+
+    
 
 
 
     <!-- Add PHP or any server-side scripting language to fetch and display data from the Investors table -->
 </table>
+
+{{>crudForm}}

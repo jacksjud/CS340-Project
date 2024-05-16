@@ -26,7 +26,23 @@ function deleteRow(event){
         .catch(error => {
                 console.error("ERROR: " , error)
         });
-    
 }
 
+const updateButton = document.getElementById("update-row-button");
+updateButton.addEventListener("click", updateRow)
+
+function updateRow(event){
+    /* */
+}
+
+
+
+const createButton = document.getElementById("create-row-button");
+createButton.addEventListener("click", createRow)
+
+function createRow(event){
+
+}
+
+const replaceButton = document.getElementById("replace-row-button");
 
