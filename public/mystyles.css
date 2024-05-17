@@ -1,0 +1,50 @@
+/* Form Styles */
+form {
+    margin-top: 20px;
+}
+
+/* Table Block Styles */
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+th, td {
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+}
+th {
+    background-color: #f2f2f2;
+}
+
+/* Navigation Bar Styles */
+nav {
+    background-color: #333; /* Change the background color */
+    padding: 10px; /* Add padding */
+    text-align: center; /* Center the links */
+}
+
+nav ul {
+    list-style-type: none; /* Remove default list styles */
+    margin: 0;
+    padding: 0;
+}
+
+nav ul li {
+    display: inline; /* Display list items horizontally */
+    margin-right: 20px; /* Add spacing between links */
+}
+
+nav ul li:last-child {
+    margin-right: 0; /* Remove right margin for the last link */
+}
+
+nav ul li a {
+    color: white; /* Change link color */
+    text-decoration: none; /* Remove underline */
+    font-size: 18px; /* Adjust font size */
+}
+
+nav ul li a:hover {
+    text-decoration: underline; /* Underline link on hover */
+}

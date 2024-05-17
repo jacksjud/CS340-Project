@@ -1,4 +1,8 @@
+<!-- investors.hbs -->
+
+{{!-- Title --}}
 <h2>Investors Page</h2>
+
 {{!-- Create a table --}}
 <table>
     {{!-- Header section --}}
@@ -13,8 +17,12 @@
             {{/each}}
         </tr>
     </thead>
+    
     {{!-- Body section --}}
     <tbody>
+        {{!-- Navigation Bar --}}
+        {{>navBar_editor}}
+
         {{!-- For each row, print the investorID and name in order --}}
         {{#each data}}
         <tr>
@@ -24,3 +32,6 @@
         {{/each}}
     </tbody>
 </table>
+
+{{!-- CRUD Form --}}
+{{>crudForm}}

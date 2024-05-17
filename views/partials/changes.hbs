@@ -1,4 +1,8 @@
+<!-- changes.hbs -->
+
+{{!-- Title --}}
 <h2>Changes Page</h2>
+
 {{!-- Create a table --}}
 <table>
     {{!-- Header section --}}
@@ -13,8 +17,12 @@
             {{/each}}
         </tr>
     </thead>
+
     {{!-- Body section --}}
     <tbody>
+        {{!-- Navigation Bar --}}
+        {{>navBar_editor}}
+
         {{!-- For each row, print the investorID and name in order --}}
         {{#each data}}
         <tr>
@@ -25,7 +33,14 @@
             <td>{{this.priceHigh}}</td>
             <td>{{this.priceLow}}</td>
             <td>{{this.date}}</td>
+            <td>
+            {{!-- <button class="update-button">Update</button> --}}
+            <button class="delete-button">Delete</button>
+            </td>
         </tr>
         {{/each}}
     </tbody>
 </table>
+
+{{!-- CRUD Form --}}
+{{>crudForm}}
