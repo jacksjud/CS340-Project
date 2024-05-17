@@ -21,7 +21,7 @@ PORT        = 8108;                 // Set a port number at the top so it's easy
 
 // Handlebars :{
 const { engine } = require('express-handlebars');
-///app.engine('.hbs', engine({defaultLayout: "main" }))    // Sets up template engine (.hbs instead of handlebars)
+app.engine('.hbs', engine({defaultLayout: "main" }))    // Sets up template engine (.hbs instead of handlebars)
 app.engine('.hbs', engine({extname: ".hbs"}));          // Create an instance of the handlebars engine to process templates
 app.set('view engine', '.hbs');                         // Tell express to use the handlebars engine whenever it encounters a *.hbs file.
 
@@ -54,9 +54,6 @@ function formatData(results){
         return data;
     });
 }
-
-// Serve static files from the 'public' directory
-app.use(express.static(path.join(__dirname, 'public')));
 
 // Set the correct MIME type for CSS files
 app.use('*.css', (req, res, next) => {
@@ -97,11 +94,10 @@ app.get("/show/:table", function(req, res) {
         if(error){
             if(DEBUG == true){ // Make sure debug is set to true
                 res.json({ status: false, error: 'Error showing table' });
-                return; // So errors don't crash the server
+                console.error('Error showing table:', error);
             } else {
                 res.render('404');
-            } // Always print error to terminal
-            console.error('Error showing table:', error);
+            }
         } else {
             if(results.length === 0){
                 res.render('partials/showTables', {

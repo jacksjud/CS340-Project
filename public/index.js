@@ -1,5 +1,6 @@
 const deleteButtons = document.querySelectorAll(".delete-button");
 
+
 deleteButtons.forEach(button => {
     button.addEventListener('click', deleteRow);
     console.log("event listener added")
