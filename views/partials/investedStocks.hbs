@@ -1,4 +1,8 @@
+<!-- investedStocks.hbs -->
+
+{{!-- Title --}}
 <h2>Invested Stocks Page</h2>
+
 {{!-- Create a table --}}
 <table>
     {{!-- Header section --}}
@@ -13,8 +17,12 @@
             {{/each}}
         </tr>
     </thead>
+    
     {{!-- Body section --}}
     <tbody>
+        {{!-- Navigation Bar --}}
+        {{>navBar_editor}}
+
         {{!-- For each row, print the investedStockID, stockID, investID, quantity and investment in order --}}
         {{#each data}}
         <tr>
@@ -27,3 +35,6 @@
         {{/each}}
     </tbody>
 </table>
+
+{{!-- CRUD Form --}}
+{{>crudForm}}
