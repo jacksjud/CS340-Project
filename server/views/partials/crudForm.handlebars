@@ -5,11 +5,11 @@
                 <th>{{this}}</th>
             {{/each}}
         </tr>
-        <tr>
+        {{!-- <tr>
             {{#each attributes}}
                 <td><label for="{{this}}">{{this}}</label></td>
             {{/each}}
-        </tr>
+        </tr> --}}
         <tr>
             {{#each attributes}}
                 <td><input type="text" id="{{this}}" name="{{this}}"></td>
@@ -18,5 +18,5 @@
     </table>
     <button type="submit" id="create-row-button">Create Row</button>
     <button type="submit" id="update-row-button">Update Row</button>
-    <button type="submit" id="replace-table-button">Replace Table Data</button>
+    <button type="submit" id="replace-table-button" class="replace-table-button">Replace Table Data</button>
 </form>

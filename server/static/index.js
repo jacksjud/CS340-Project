@@ -53,21 +53,19 @@ replaceButton.forEach(button => {
 // replaceTables();
 
 function replaceTables(event){
-    const tableToReplace = document.querySelector('h1').textContent;
-    console.log(tableToReplace);
-    fetch(`/replace/${tableToReplace}/`)
+    const zip = document.querySelector('h1').textContent;
+    console.log(`== ${arguments.callee.name} called == `);
+    event.preventDefault()
+    console.log(zip)
+    fetch(`/get-location/zip?zip=${zip}`)
         .then(response => response.json())
-        .then(data => {
-            const response = data["status"];
-            if(response){
-                console.log("Table replaced")
-                location.reload();
-            } else {
-                console.error("Failed to replace table");
-                alert("Unable to replace table!")
-            }
+        .then( data => {
+            var status = data["status"];
+            console.log(status);
+            location.reload();
         })
         .catch(error => {
-            console.error("ERROR: " , error)
-        });
+            console.error("Zip failed: ", error)
+        })
+    
 }

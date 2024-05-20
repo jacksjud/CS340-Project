@@ -1,4 +1,4 @@
-const fs = require('fs/promises');
+const fs = require('fs');
 const path = require('path');
 const handlebars = require("handlebars")
 const hb_adapter = require('express-handlebars');
@@ -24,6 +24,14 @@ app.engine('handlebars', hb_adapter.engine({ defaultLayout: "main" }))   // sets
 app.set('view engine', 'handlebars')            // sets up view engine 
 app.set('views', './views')                     // registers where templates are
 
+
+// Read the SQL file
+const sqlFilePath = path.join(__dirname, 'database', 'DDL.sql');
+const sqlCommands = fs.readFileSync(sqlFilePath, 'utf-8');
+// Remove unnecessary newline characters
+const sqlCommandsArray = sqlCommands.split(';');
+
+
 const dbTablePKs = {
     "Investors":"investorID",
     "Stocks":"stockID",
@@ -31,33 +39,6 @@ const dbTablePKs = {
     "Investments": "investID",
     "InvestedStocks": "investedStockID"
 }
-
-
-// const testDatabaseConnection = async () => {
-//     // Create a connection pool using environment variables
-//     const pool = mysql.createPool({
-//         connectionLimit: 10,
-//         host: process.env.HOST,
-//         user: user,
-//         password: process.env.MYSQLPASS,
-//         database: process.env.DB
-//     });
-
-//     // Attempt to connect to the database
-//     pool.getConnection((err, connection) => {
-//         if (err) {
-//             console.error('Error connecting to database:', err.message);
-//             return;
-//         }
-
-//         console.log('Database connected successfully!');
-//         connection.release(); // Release the connection back to the pool
-//     });
-// };
-
-// Call the function to test the database connection
-// testDatabaseConnection();
-
 
 function formatData(results){
     return results.map(row => {
@@ -72,6 +53,15 @@ function formatData(results){
         return data;
     });
 }
+
+// Establish the database connection
+quick.connect.connect((err) => {
+    if (err) {
+        console.error('Error connecting to database:', err);
+        return;
+    }
+    console.log('Connected to the database');
+});
 
 app.get("/", function(req, res) {
     res.render('body', {
@@ -181,6 +171,47 @@ app.get("/replace/:table", function (req, res) {
         });
     });
 });
+
+// Route handler to handle GET requests for getting location by zip
+app.get("/get-location/zip", function(req, res) {
+    const zip = req.query["zip"];
+
+    // // Execute your database query here using the existing connection object
+    // quick.connect.query(cleanedSqlScript, (err, results) => {
+    //     if (err) {
+    //         console.error('Error executing SQL commands:', err);
+    //         res.status(500).json({ error: 'Internal server error' });
+    //         return;
+    //     }
+
+    //     console.log('SQL commands executed successfully:', results);
+
+    //     // Send the response back to the client
+    //     res.json({ status: true, results });
+    // });
+
+    // Iterate through each SQL command and execute it
+    sqlCommandsArray.forEach((sqlCommand) => {
+        if (sqlCommand.trim() !== '') { // Ignore empty commands
+            quick.connect.query(sqlCommand, (error, results, fields) => {
+                if (error) {
+                    console.error('Error executing SQL command:', error);
+                    res.json({status: false, error: error});
+                    return;
+                }
+
+                // console.log('SQL command executed successfully:', results);
+                console.log("Successful query");
+            });
+        }
+    });
+    console.log("sending response to client/browser");
+    res.json({ status: true});
+});
+
+//Testing
+
+// Connect to the database
 
 
 
