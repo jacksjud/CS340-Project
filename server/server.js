@@ -7,6 +7,8 @@ const mysql = require('mysql')
 const db = require('./database/db-connector');
 const quick = require('./database/db-quick');
 const { table } = require('console');
+const os = require('os');
+const bodyParser = require('body-parser');
 require('dotenv').config()
 
 const replacementQueries = require('./replaceData.json')
@@ -15,10 +17,11 @@ const replacementQueries = require('./replaceData.json')
 // Create the express server
 var app = express()
 var port = process.env.PORT || 3000 // PORT
+const hostname = os.hostname();
 
 // Use the static middleware and don't serve directory index files
 app.use(express.static('static', { index: false }))
-
+app.use(bodyParser.json());
 // Use handlebars
 app.engine('handlebars', hb_adapter.engine({ defaultLayout: "main" }))   // sets up template engine (handlebars)
 app.set('view engine', 'handlebars')            // sets up view engine 
@@ -26,7 +29,7 @@ app.set('views', './views')                     // registers where templates are
 
 
 // Read the SQL file
-const sqlFilePath = path.join(__dirname, 'database', 'DDL.sql');
+const sqlFilePath = path.join(__dirname, 'database', 'refillTables.sql');
 const sqlCommands = fs.readFileSync(sqlFilePath, 'utf-8');
 // Remove unnecessary newline characters
 const sqlCommandsArray = sqlCommands.split(';');
@@ -40,6 +43,28 @@ const dbTablePKs = {
     "InvestedStocks": "investedStockID"
 }
 
+// function template: 
+/* ================================================
+--------------------------------------------------- 
+Function:   
+===================================================
+
+Desc:
+
+================================================ */
+
+
+
+
+/* ================================================
+--------------------------------------------------- 
+Function:   formatData
+===================================================
+
+Desc: Takes data that the sql server gives initially
+and parses it to suit our needs
+
+================================================ */
 function formatData(results){
     return results.map(row => {
         // Extract data from each row
@@ -54,13 +79,36 @@ function formatData(results){
     });
 }
 
+
+/* ================================================
+--------------------------------------------------- 
+Function:   generateInsertQuery
+===================================================
+
+Desc: Takes a table name, columns to add to, and
+values to insert and generates an insert query.
+
+================================================ */
+function generateInsertQuery(tableName, columns, values) {
+    // Generate the columns part of the query
+    const columnsPart = columns.join(', ');
+
+    // Generate the values part of the query
+    const valuesPart = `(${values.map(value => typeof value === 'string' ? `'${value}'` : value).join(', ')})`;
+
+    // Construct the final query string
+    const query = `INSERT INTO ${tableName} (${columnsPart}) VALUES ${valuesPart};`;
+
+    return query;
+}
+
 // Establish the database connection
 quick.connect.connect((err) => {
     if (err) {
-        console.error('Error connecting to database:', err);
+        console.error('== Error connecting to database:', err);
         return;
     }
-    console.log('Connected to the database');
+    console.log('== Connected to the database');
 });
 
 app.get("/", function(req, res) {
@@ -98,7 +146,6 @@ app.get("/tables/:table", async function(req, res) {
 
 app.get('/delete/row', function(req, res) {
     const { table, row } = req.query;
-    console.log("table, row: ", table, row);
 
     // Disable foreign key checks
     quick.connect.query('SET foreign_key_checks = 0', function(error) {
@@ -131,65 +178,11 @@ app.get('/delete/row', function(req, res) {
 });
 
 
-app.get("/replace/:table", function (req, res) {
-    // Disable foreign key checks
-    db.pool.query('SET foreign_key_checks = 0;', function(error) {
-        if (error) {
-            console.error('Error disabling foreign key checks:', error);
-            res.json({ status: false, error: 'Error disabling foreign key checks;' });
-            return;
-        }
-
-        // Execute the replacement query
-        const queryUpdate = replacementQueries[req.params.table];
-        db.pool.query(queryUpdate, function(error, results) {
-            if (error) {
-                console.error('Error replacing table:', error);
-                res.json({ status: false, error: 'Error replacing table' });
-                return;
-            }
-
-            // Commit the transaction
-            db.pool.query('COMMIT;', function(err) {
-                if (err) {
-                    console.error('Error committing transaction:', err);
-                    res.json({ status: false, error: 'Error committing transaction' });
-                    return;
-                }
-
-                // Enable foreign key checks
-                db.pool.query('SET foreign_key_checks = 1;', function(err) {
-                    if (err) {
-                        console.error('Error enabling foreign key checks:', err);
-                        res.json({ status: false, error: 'Error enabling foreign key checks' });
-                        return;
-                    }
-
-                    res.json({ status: true });
-                });
-            });
-        });
-    });
-});
-
-// Route handler to handle GET requests for getting location by zip
-app.get("/get-location/zip", function(req, res) {
-    const zip = req.query["zip"];
-
-    // // Execute your database query here using the existing connection object
-    // quick.connect.query(cleanedSqlScript, (err, results) => {
-    //     if (err) {
-    //         console.error('Error executing SQL commands:', err);
-    //         res.status(500).json({ error: 'Internal server error' });
-    //         return;
-    //     }
-
-    //     console.log('SQL commands executed successfully:', results);
-
-    //     // Send the response back to the client
-    //     res.json({ status: true, results });
-    // });
-
+// Route handler to handle GET requests for replacing table data (currently, all of it)
+app.get("/replace-table/table", function(req, res) {
+    // Currently not used, it's the table name. could be useful for other stuff later
+    const table = req.query["table"];
+    console.log("== Table to Replace: ", table);
     // Iterate through each SQL command and execute it
     sqlCommandsArray.forEach((sqlCommand) => {
         if (sqlCommand.trim() !== '') { // Ignore empty commands
@@ -201,27 +194,64 @@ app.get("/get-location/zip", function(req, res) {
                 }
 
                 // console.log('SQL command executed successfully:', results);
-                console.log("Successful query");
+                // console.log("Successful query");
             });
         }
     });
-    console.log("sending response to client/browser");
+    console.log("== Table Replaced Successfully");
     res.json({ status: true});
 });
 
-//Testing
+app.post("/create-table", (req, res) => {
+    const tableData = (req.body);
 
-// Connect to the database
+    console.log("Received Table Data: ", tableData);
+    // let tableName = tableData["tableName"]
 
+    // Variables we'll have input for (columns)
+    var columns = Object.keys(tableData)
+    // Removes first two elements
+    columns.shift();
+    columns.shift();
+
+    // Values to add
+    var insertValues = Object.values(tableData)
+    // Save table name in variable 
+    var tableName = insertValues[0]
+    // Removes first element (table name)
+    insertValues.shift();
+    insertValues.shift();
+    
+    
+
+    const queryCreate = generateInsertQuery(tableName , columns, insertValues )
+    console.log(queryCreate);
+    // const queryCreate = `INSERT INTO ${tableData["tableName"]}`
+    quick.connect.query(queryCreate, (error, results, fields) => {
+        if(error){
+            console.error("Error executing SQL command: ", error)
+            res.json({status : false, message: "row not created"})
+        } else {
+            console.log("== Row Successfully Created")
+            res.json({ status: true });
+        }
+    })
+
+
+
+
+    // res.json({ status: true , message: "table data received successfully"});
+})
 
 
 app.get('*', function (req, res) {
     res.render('404')
 })
 
-// Listen on port
-app.listen(port, function () {
-    console.log("== Server is listening on port", port)
-})
 
-
+/*
+    LISTENER
+*/
+app.listen(port, function(){    // This is the basic syntax for what is called the 'listener' which receives incoming requests on the specified PORT.
+    console.log('== Express started on http://'+ hostname +':' + port + ' press Ctrl-C to terminate.');
+});
