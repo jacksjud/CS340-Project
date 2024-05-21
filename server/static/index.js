@@ -1,6 +1,13 @@
 document.addEventListener('DOMContentLoaded', function() {
     console.log("== DOM Content Loaded ==")
+    
 });
+
+if (performance.getEntriesByType("navigation")[0].type === "navigate") {
+    // This code will only run on the first load
+    // replaceAll();
+}
+
 
 function formatTableName(name){
     console.log(`== ${arguments.callee.name} called == `);
@@ -160,5 +167,26 @@ function replaceTables(event){
         })
 }
 
+/* ====================================================================================
+FOCUS:
+
+replaceAll -
+==================================================================================== */ 
 
 
+function replaceAll(){
+    console.log(`== ${arguments.callee.name} called == `);
+    fetch("/replace-table/all")
+        .then(response => response.json())
+        .then(data => {
+            const status = data["status"]
+            if(status){
+                console.log("== All Tables Replenished ==")
+            } else{
+                console.log("Error: ", data.error);
+            }
+        })
+        .catch(error => {
+            console.error("ERROR: ", error)
+        })
+}

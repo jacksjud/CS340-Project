@@ -1,17 +1,12 @@
 const fs = require('fs');
 const path = require('path');
 const handlebars = require("handlebars")
-const hb_adapter = require('express-handlebars');
+const { engine } = require('express-handlebars');
 const express = require('express')
-const mysql = require('mysql')
-const db = require('./database/db-connector');
 const quick = require('./database/db-quick');
-const { table } = require('console');
 const os = require('os');
 const bodyParser = require('body-parser');
 require('dotenv').config()
-
-const replacementQueries = require('./replaceData.json')
 
 
 // Create the express server
@@ -23,17 +18,9 @@ const hostname = os.hostname();
 app.use(express.static('static', { index: false }))
 app.use(bodyParser.json());
 // Use handlebars
-app.engine('handlebars', hb_adapter.engine({ defaultLayout: "main" }))   // sets up template engine (handlebars)
+app.engine('handlebars', engine({ defaultLayout: "main" }))   // sets up template engine (handlebars)
 app.set('view engine', 'handlebars')            // sets up view engine 
 app.set('views', './views')                     // registers where templates are
-
-
-// Read the SQL file
-const sqlFilePath = path.join(__dirname, 'database', 'refillTables.sql');
-const sqlCommands = fs.readFileSync(sqlFilePath, 'utf-8');
-// Remove unnecessary newline characters
-const sqlCommandsArray = sqlCommands.split(';');
-
 
 const dbTablePKs = {
     "Investors":"investorID",
@@ -41,6 +28,14 @@ const dbTablePKs = {
     "Changes":"changeID",
     "Investments": "investID",
     "InvestedStocks": "investedStockID"
+}
+
+const doGraphs = {
+    "Investors":false,
+    "Stocks":true,
+    "Changes":true,
+    "Investments": true,
+    "InvestedStocks": false
 }
 
 // function template: 
@@ -138,7 +133,8 @@ app.get("/tables/:table", async function(req, res) {
                 body: "table",
                 title: table,
                 attributes: Object.keys(newObjects[0]),
-                inputs: Object.values(newObjects)
+                inputs: Object.values(newObjects),
+                dograph: doGraphs[table]
             });
         }
     });
@@ -183,6 +179,9 @@ app.get("/replace-table/table", function(req, res) {
     // Currently not used, it's the table name. could be useful for other stuff later
     const table = req.query["table"];
     console.log("== Table to Replace: ", table);
+    const sqlFilePath = path.join(__dirname, 'database/refill', `refill${table}.sql`);
+    const sqlCommands = fs.readFileSync(sqlFilePath, 'utf-8');
+    const sqlCommandsArray = sqlCommands.split(';');
     // Iterate through each SQL command and execute it
     sqlCommandsArray.forEach((sqlCommand) => {
         if (sqlCommand.trim() !== '') { // Ignore empty commands
@@ -200,6 +199,29 @@ app.get("/replace-table/table", function(req, res) {
     });
     console.log("== Table Replaced Successfully");
     res.json({ status: true});
+});
+
+app.get("/replace-table/all", function(req, res) {
+    const sqlFilePath = path.join(__dirname, 'database/refill', `refillTables.sql`);
+    const sqlCommands = fs.readFileSync(sqlFilePath, 'utf-8');
+    const sqlCommandsArray = sqlCommands.split(';');
+    // Iterate through each SQL command and execute it
+    sqlCommandsArray.forEach((sqlCommand) => {
+        if (sqlCommand.trim() !== '') { // Ignore empty commands
+            quick.connect.query(sqlCommand, (error, results, fields) => {
+                if (error) {
+                    console.error('Error executing SQL command:', error);
+                    res.json({status: false, error: error , message: "Could not repopulate all tables"});
+                    return;
+                }
+
+                // console.log('SQL command executed successfully:', results);
+                // console.log("Successful query");
+            });
+        }
+    });
+    console.log("== All Tables Replaced Successfully");
+    res.json({ status: true, message: "Successfully repopulated all tables"});
 });
 
 app.post("/create-table", (req, res) => {
