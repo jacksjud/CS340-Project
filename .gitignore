@@ -1,0 +1,3 @@
+# Ignore all files named db-connector anywhere in the repository
+**/db-connector.js
+
