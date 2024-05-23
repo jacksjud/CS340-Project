@@ -38,6 +38,56 @@ const doGraphs = {
     "InvestedStocks": false
 }
 
+const attributes = {
+    "Investors":true,
+    "Stocks":true,
+    "Changes":true,
+    "Investments": true,
+    "InvestedStocks": false
+}
+
+const search = {
+    "Investors":false,
+    "Stocks":false,
+    "Changes":false,
+    "Investments": true,
+    "InvestedStocks": false
+}
+
+const dropdownConfigs = {
+    "Investors":{
+        "InvestorID": true,
+        "Name": false
+    },
+    "Stocks":{
+        "StockID": true,
+        "Symbol": false,
+        "CompanyName": false
+    },
+    "Changes":{
+        "ChangeID": true,
+        "StockID": true,
+        "PriceOpen": false,
+        "PriceClose": false,
+        "PriceHigh": false,
+        "PriceLow": false,
+        "Date": false
+    },
+    "Investments": {
+        "InvestID": true,
+        "InvestorID": true,
+        "Date": false
+    },
+    "InvestedStocks": {
+        "InvestedStockID": true,
+        "StockID": true,
+        "InvestID": true,
+        "Quantity": false,
+        "Investment": false
+    }
+};
+
+
 // function template: 
 /* ================================================
 --------------------------------------------------- 
@@ -60,9 +110,151 @@ Desc: Takes data that the sql server gives initially
 and parses it to suit our needs
 
 ================================================ */
-function formatData(results){
+// function testFormatData(results, tableName, dropdownConfig) {
+
+
+//     const inputs = {}
+//     results.forEach( result => {
+//         const isDD = dropdownConfig[tableName][result]
+//         let options = [];
+//         if(isDD){
+//             querySelect = selectQuery(tableName , result)
+//             quick.connect.query(querySelect, (error, results, fields) => {
+//                 if (error) throw error;
+//                 else{
+//                     // console.log(results)
+//                     options = singleOutData(results , result)
+//                     console.log(options)
+//                     inputs[result] = {
+//                         attr: result,
+//                         isDropdown: isDD,
+//                         options: options
+//                     }
+
+//                 }
+//             });
+//         } else {
+//             inputs[result] = {
+//                 attr: result,
+//                 isDropdown: isDD,
+//                 options: options
+//             }
+//         }
+        
+//     })
+//     console.log(inputs)
+//     return inputs;
+// }
+
+// async function testFormatData(results, tableName, dropdownConfig) {
+//     const inputs = {};
+
+//     // Collect unique attributes from the results
+//     const attributes = results;
+
+//     // Use Promise.all to handle multiple asynchronous operations
+//     await Promise.all(attributes.map(async (result) => {
+//         const isDD = dropdownConfig[tableName] && dropdownConfig[tableName][result];
+//         let options = [];
+//         if (isDD) {
+//             const querySelect = selectQuery(tableName, result);
+//             try {
+//                 const queryResults = await new Promise((resolve, reject) => {
+//                     quick.connect.query(querySelect, (error, results) => {
+//                         if (error) {
+//                             reject(error);
+//                         } else {
+//                             resolve(results);
+//                         }
+//                     });
+//                 });
+//                 options = singleOutData(queryResults, result);
+//             } catch (error) {
+//                 console.error(`Error fetching dropdown options for ${result}:`, error);
+//             }
+//         }
+//         inputs[result] = {
+//             attr: result,
+//             isDropdown: isDD,
+//             options: options
+//         };
+//     }));
+
+//     console.log(inputs);
+//     return inputs;
+// }
+
+async function testFormatData(results, tableName, dropdownConfig) {
+    const inputs = {};
+
+    // Helper function to fetch options for dropdowns
+    const fetchOptions = async (attr) => {
+        const querySelect = selectQuery(tableName, attr);
+        try {
+            const queryResults = await new Promise((resolve, reject) => {
+                quick.connect.query(querySelect, (error, results) => {
+                    if (error) {
+                        reject(error);
+                    } else {
+                        resolve(results);
+                    }
+                });
+            });
+            return singleOutData(queryResults, attr);
+        } catch (error) {
+            console.error(`Error fetching dropdown options for ${attr}:`, error);
+            return [];
+        }
+    };
+
+    // Process specific attributes synchronously
+    for (let result of results) {
+        const isDD = dropdownConfig[tableName][result];
+        if (isDD) {
+            const options = await fetchOptions(result);
+            inputs[result] = {
+                attr: result,
+                isDropdown: isDD,
+                options: options
+            };
+        }
+    }
+
+    // Process the remaining attributes
+    await Promise.all(results.map(async (result) => {
+        const isDD = dropdownConfig[tableName][result];
+        if (isDD) {
+            let options = [];
+            if (isDD) {
+                options = await fetchOptions(result);
+            }
+            inputs[result] = {
+                attr: result,
+                isDropdown: isDD,
+                options: options
+            };
+        } else{
+            let options = []
+            inputs[result] = {
+                attr: result,
+                isDropdown: isDD,
+                options: options
+            };
+        }
+    }));
+
+    return inputs;
+}
+function singleOutData(data, attribute){
+    const uniqueValues = new Set();
+    data.forEach(item => {
+        uniqueValues.add(item[attribute]);
+    });
+    return [...uniqueValues].sort((a, b) => a - b);
+}
+
+function formatData(results) {
     return results.map(row => {
-        // Extract data from each row
         const data = {};
         for (const key in row) {
             if (row.hasOwnProperty(key)) {
@@ -74,6 +266,14 @@ function formatData(results){
     });
 }
 
+
+function selectQuery(tableName, attribute , comparison=null){
+    let query = `SELECT ${attribute} FROM ${tableName}`;
+    if (comparison !== null) {
+        query += ` WHERE ${attribute} = ${comparison}`;
+    }
+    return query;
+}
 
 /* ================================================
 --------------------------------------------------- 
@@ -111,34 +311,46 @@ app.get("/", function(req, res) {
 
     })
 })
-
-app.get("/tables/:table", async function(req, res) {
+app.get("/tables/:table", async function(req, res) {  // Mark the function as async
     const tableName = req.params.table;
     const table = tableName.charAt(0).toUpperCase() + tableName.slice(1);
     const querySelect = `SELECT * FROM ${table};`
-    quick.connect.query(querySelect, (error, results, fields) => {
-        if (error) throw error;
-        // console.log('results: ', results);
-        // console.log(formatData(results));
 
-        if(results.length === 0){
+    quick.connect.query(querySelect, async (error, results) => {  // Make the callback async
+        if (error) throw error;
+
+        if (results.length === 0) {
             res.render('editor', {
                 body: "table",
                 title: table
             });
         } else {
             const newObjects = formatData(results);
+            const keys = Object.keys(newObjects[0]);
+            const values = Object.values(newObjects);
+            
 
-            res.render('editor', {
-                body: "table",
-                title: table,
-                attributes: Object.keys(newObjects[0]),
-                inputs: Object.values(newObjects),
-                dograph: doGraphs[table]
-            });
+            try {
+                const crudInputs = await testFormatData(keys, table, dropdownConfigs);  // Await the testFormatData call
+                console.log(keys)
+                console.log(values)
+                console.log(crudInputs)
+                res.render('editor', {
+                    body: "table",
+                    title: table,
+                    attributes: keys,
+                    crudInputs: crudInputs,
+                    inputs: values,
+                    dograph: doGraphs[table],
+                    search: search[table]
+                });
+            } catch (error) {
+                console.error("Error formatting data:", error);
+                res.status(500).send("Server error");
+            }
         }
     });
-})
+});
 
 app.get('/delete/row', function(req, res) {
     const { table, row } = req.query;
@@ -247,7 +459,7 @@ app.post("/create-table", (req, res) => {
     
 
     const queryCreate = generateInsertQuery(tableName , columns, insertValues )
-    console.log(queryCreate);
+    // console.log(queryCreate);
     // const queryCreate = `INSERT INTO ${tableData["tableName"]}`
     quick.connect.query(queryCreate, (error, results, fields) => {
         if(error){

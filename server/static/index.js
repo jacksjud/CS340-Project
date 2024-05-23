@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
     console.log("== DOM Content Loaded ==")
+    dynamicDropdown();
     
 });
 
@@ -40,6 +41,25 @@ function clearInputs(){
     inputs.forEach(input =>{
         input.value = '';
     })
+}
+
+function dynamicDropdown(){
+    const tableRows = document.querySelectorAll('table tbody tr:not(:first-child)'); // Skip header row
+    const investorIDSet = new Set();
+
+    tableRows.forEach(row => {
+        const investorID = row.children[1].textContent.trim();
+        investorIDSet.add(investorID);
+    });
+
+    const investorIDFilter = document.getElementById('investorIDFilter');
+
+    investorIDSet.forEach(investorID => {
+        const option = document.createElement('option');
+        option.value = investorID;
+        option.textContent = investorID;
+        investorIDFilter.appendChild(option);
+    });
 }
 
 /* ====================================================================================
@@ -190,3 +210,4 @@ function replaceAll(){
             console.error("ERROR: ", error)
         })
 }
+
