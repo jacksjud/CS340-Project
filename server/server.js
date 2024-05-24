@@ -103,93 +103,21 @@ Desc:
 
 /* ================================================
 --------------------------------------------------- 
-Function:   formatData
+Function:   formatDropDownData
 ===================================================
 
-Desc: Takes data that the sql server gives initially
-and parses it to suit our needs
+Desc: Gets available priority keys for drop down
+menus.
 
 ================================================ */
-// function testFormatData(results, tableName, dropdownConfig) {
-
-
-//     const inputs = {}
-//     results.forEach( result => {
-//         const isDD = dropdownConfig[tableName][result]
-//         let options = [];
-//         if(isDD){
-//             querySelect = selectQuery(tableName , result)
-//             quick.connect.query(querySelect, (error, results, fields) => {
-//                 if (error) throw error;
-//                 else{
-//                     // console.log(results)
-//                     options = singleOutData(results , result)
-//                     console.log(options)
-//                     inputs[result] = {
-//                         attr: result,
-//                         isDropdown: isDD,
-//                         options: options
-//                     }
-
-//                 }
-//             });
-//         } else {
-//             inputs[result] = {
-//                 attr: result,
-//                 isDropdown: isDD,
-//                 options: options
-//             }
-//         }
-        
-//     })
-//     console.log(inputs)
-//     return inputs;
-// }
-
-// async function testFormatData(results, tableName, dropdownConfig) {
-//     const inputs = {};
-
-//     // Collect unique attributes from the results
-//     const attributes = results;
-
-//     // Use Promise.all to handle multiple asynchronous operations
-//     await Promise.all(attributes.map(async (result) => {
-//         const isDD = dropdownConfig[tableName] && dropdownConfig[tableName][result];
-//         let options = [];
-//         if (isDD) {
-//             const querySelect = selectQuery(tableName, result);
-//             try {
-//                 const queryResults = await new Promise((resolve, reject) => {
-//                     quick.connect.query(querySelect, (error, results) => {
-//                         if (error) {
-//                             reject(error);
-//                         } else {
-//                             resolve(results);
-//                         }
-//                     });
-//                 });
-//                 options = singleOutData(queryResults, result);
-//             } catch (error) {
-//                 console.error(`Error fetching dropdown options for ${result}:`, error);
-//             }
-//         }
-//         inputs[result] = {
-//             attr: result,
-//             isDropdown: isDD,
-//             options: options
-//         };
-//     }));
-
-//     console.log(inputs);
-//     return inputs;
-// }
-
-async function testFormatData(results, tableName, dropdownConfig) {
+async function formatDropDownData(results, tableName, dropdownConfig) {
     const inputs = {};
 
     // Helper function to fetch options for dropdowns
     const fetchOptions = async (attr) => {
-        const querySelect = selectQuery(tableName, attr);
+        // Generates a select query based on an attribute and table name
+        const querySelect = generateSelectQuery(tableName, attr);
+        // Attempts to get query from database
         try {
             const queryResults = await new Promise((resolve, reject) => {
                 quick.connect.query(querySelect, (error, results) => {
@@ -200,6 +128,7 @@ async function testFormatData(results, tableName, dropdownConfig) {
                     }
                 });
             });
+            // If repeating data, call function to single it out and return that.
             return singleOutData(queryResults, attr);
         } catch (error) {
             console.error(`Error fetching dropdown options for ${attr}:`, error);
@@ -209,9 +138,12 @@ async function testFormatData(results, tableName, dropdownConfig) {
 
     // Process specific attributes synchronously
     for (let result of results) {
+        // Determine if the attribute needs a drop down display
         const isDD = dropdownConfig[tableName][result];
         if (isDD) {
+            // Get drop down data
             const options = await fetchOptions(result);
+            // Add info
             inputs[result] = {
                 attr: result,
                 isDropdown: isDD,
@@ -222,6 +154,7 @@ async function testFormatData(results, tableName, dropdownConfig) {
 
     // Process the remaining attributes
     await Promise.all(results.map(async (result) => {
+        // Determine if the attribute needs a drop down display
         const isDD = dropdownConfig[tableName][result];
         if (isDD) {
             let options = [];
@@ -233,6 +166,7 @@ async function testFormatData(results, tableName, dropdownConfig) {
                 isDropdown: isDD,
                 options: options
             };
+        // If the attribute doesn't need drop down info, just give options an empty arrary
         } else{
             let options = []
             inputs[result] = {
@@ -245,6 +179,17 @@ async function testFormatData(results, tableName, dropdownConfig) {
 
     return inputs;
 }
+
+/* ================================================
+--------------------------------------------------- 
+Function:   singleOutData
+===================================================
+
+Desc: Takes data (table keys/ numbers), if there are 
+any repeating data, single it out, and return it 
+in ascending order.
+
+================================================ */
 function singleOutData(data, attribute){
     const uniqueValues = new Set();
     data.forEach(item => {
@@ -253,6 +198,15 @@ function singleOutData(data, attribute){
     return [...uniqueValues].sort((a, b) => a - b);
 }
 
+/* ================================================
+--------------------------------------------------- 
+Function:   formatData
+===================================================
+
+Desc: Takes data that the sql server gives initially
+and parses it to suit our needs.
+
+================================================ */
 function formatData(results) {
     return results.map(row => {
         const data = {};
@@ -266,12 +220,44 @@ function formatData(results) {
     });
 }
 
+/* ================================================
+--------------------------------------------------- 
+Function:   generateSelectQuery
+===================================================
 
-function selectQuery(tableName, attribute , comparison=null){
+Desc: Returns a select query from a given table,
+and attribute. Optionally, a comparison can be
+provided that will implement a WHERE clause
+for the provided attribute.
+
+================================================ */
+function generateSelectQuery(tableName, attribute , comparison=null){
     let query = `SELECT ${attribute} FROM ${tableName}`;
     if (comparison !== null) {
         query += ` WHERE ${attribute} = ${comparison}`;
     }
+    return query;
+}
+
+/* ================================================
+--------------------------------------------------- 
+Function:   generateUpdateQuery
+===================================================
+
+Desc: Generates an update query given a table name,
+a primary key to search for and what value it
+should have, and an object of the attributes
+to change (as keys) and their corresponding
+updated values. 
+
+================================================ */
+function generateUpdateQuery(table, primaryKeyName, primaryKey, updatedValues) {
+    const setClauses = Object.keys(updatedValues)
+        .map(key => `${key} = '${updatedValues[key]}'`)
+        .join(', ');
+
+    const query = `UPDATE ${table} SET ${setClauses} WHERE ${primaryKeyName} = '${primaryKey}';`;
+    
     return query;
 }
 
@@ -300,7 +286,7 @@ function generateInsertQuery(tableName, columns, values) {
 // Establish the database connection
 quick.connect.connect((err) => {
     if (err) {
-        console.error('== Error connecting to database:', err);
+        console.error('== Error connecting to database: ', err);
         return;
     }
     console.log('== Connected to the database');
@@ -331,10 +317,7 @@ app.get("/tables/:table", async function(req, res) {  // Mark the function as as
             
 
             try {
-                const crudInputs = await testFormatData(keys, table, dropdownConfigs);  // Await the testFormatData call
-                console.log(keys)
-                console.log(values)
-                console.log(crudInputs)
+                const crudInputs = await formatDropDownData(keys, table, dropdownConfigs);  // Await the testFormatData call
                 res.render('editor', {
                     body: "table",
                     title: table,
@@ -373,7 +356,6 @@ app.get('/delete/row', function(req, res) {
                     res.json({ status: false, error: 'Error enabling foreign key checks' });
                     return;
                 }
-
                 if (error) {
                     console.error('Error deleting row:', error);
                     res.json({ status: false, error: 'Error deleting row' });
@@ -388,7 +370,6 @@ app.get('/delete/row', function(req, res) {
 
 // Route handler to handle GET requests for replacing table data (currently, all of it)
 app.get("/replace-table/table", function(req, res) {
-    // Currently not used, it's the table name. could be useful for other stuff later
     const table = req.query["table"];
     console.log("== Table to Replace: ", table);
     const sqlFilePath = path.join(__dirname, 'database/refill', `refill${table}.sql`);
@@ -403,9 +384,6 @@ app.get("/replace-table/table", function(req, res) {
                     res.json({status: false, error: error});
                     return;
                 }
-
-                // console.log('SQL command executed successfully:', results);
-                // console.log("Successful query");
             });
         }
     });
@@ -414,6 +392,7 @@ app.get("/replace-table/table", function(req, res) {
 });
 
 app.get("/replace-table/all", function(req, res) {
+    // Currently not used, it's the table name. could be useful for other stuff later
     const sqlFilePath = path.join(__dirname, 'database/refill', `refillTables.sql`);
     const sqlCommands = fs.readFileSync(sqlFilePath, 'utf-8');
     const sqlCommandsArray = sqlCommands.split(';');
@@ -426,9 +405,6 @@ app.get("/replace-table/all", function(req, res) {
                     res.json({status: false, error: error , message: "Could not repopulate all tables"});
                     return;
                 }
-
-                // console.log('SQL command executed successfully:', results);
-                // console.log("Successful query");
             });
         }
     });
@@ -455,8 +431,6 @@ app.post("/create-table", (req, res) => {
     // Removes first element (table name)
     insertValues.shift();
     insertValues.shift();
-    
-    
 
     const queryCreate = generateInsertQuery(tableName , columns, insertValues )
     // console.log(queryCreate);
@@ -464,17 +438,60 @@ app.post("/create-table", (req, res) => {
     quick.connect.query(queryCreate, (error, results, fields) => {
         if(error){
             console.error("Error executing SQL command: ", error)
-            res.json({status : false, message: "row not created"})
+            // Specifically handles errors when creating a table, like leaving an input as NULL etc.
+            let errorMessage = "Row not created";
+            if (error.code === 'ER_NO_REFERENCED_ROW_2') {
+                errorMessage = "Foreign key constraint error! Make sure only the first input has NULL!\n\n" + error.message;
+            } else if (error.code === 'ER_TRUNCATED_WRONG_VALUE_FOR_FIELD') {
+                errorMessage = "Data type mismatch error! One of the input fields has an invalid type (like letters where numbers go)!\n\n" + error.message;
+            } else {
+                errorMessage = "SQL error: " + error.message;
+            }
+
+            res.status(400).json({ status: false, message: errorMessage });
         } else {
             console.log("== Row Successfully Created")
             res.json({ status: true });
         }
     })
+})
 
+app.post("/update-row", (req, res) => {
+    const tableData = (req.body);
 
+    var columns = Object.keys(tableData)
+    // Get table name
+    var tableName = tableData[columns[0]]
+    // Get primary key name
+    var primaryKeyName = columns[1];
+    // Get actual primary key we're updating
+    var primaryKey = tableData[primaryKeyName];
 
+    // Delete first two elements of table data (table name and PK)
+    delete tableData[columns[0]]
+    delete tableData[primaryKeyName]
+    
+    // Get update query
+    const queryUpdate = generateUpdateQuery(tableName , primaryKeyName , primaryKey, tableData)
+    
+    // Make query with plenty of error handling
+    quick.connect.query(queryUpdate, (error, results, fields) => {
+        if (error) {
+            console.error("Error executing SQL command: ", error);
 
-    // res.json({ status: true , message: "table data received successfully"});
+            // Handle specific SQL errors like 
+            let errorMessage = "Row not updated";
+            if (error.code === 'ER_TRUNCATED_WRONG_VALUE_FOR_FIELD') {
+                errorMessage = "Data type mismatch error! One of the input fields has an invalid type (like letters where numbers go)!\n\n" + error.message;
+            } else {
+                errorMessage = "SQL error: " + error.message;
+            }
+            res.status(400).json({ status: false, message: errorMessage });
+        } else {
+            console.log("== Row Successfully Updated");
+            res.json({ status: true, message: "Row successfully updated" });
+        }
+    });
 })
 
 
