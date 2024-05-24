@@ -14,7 +14,7 @@
             {{#each crudInputs}}
                 {{#if this.isDropdown}}
                 <td>
-                    <select id="{{this.attr}}">
+                    <select class="form-input" id="{{this.attr}}">
                         <option value="">NULL</option>
                         {{#each this.options}}
                             <option value="">{{this}}</option>
@@ -23,13 +23,10 @@
                 </td>
                 
                 {{else}}
-                    <td><input type="text" id="{{@key}}" name="{{@key}}"></td>
+                    <td><input class="form-input" type="text" id="{{@key}}" name="{{@key}}"></td>
                 {{/if}}
             {{/each}}
         </tr>
-
-         
-
     </table>
     <button type="submit" id="create-row-button">Create Row</button>
     <button type="submit" id="update-row-button">Update Row</button>

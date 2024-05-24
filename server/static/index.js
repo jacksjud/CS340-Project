@@ -20,7 +20,7 @@ function getTableData(){
     console.log(`== ${arguments.callee.name} called == `);
 
     // Gets all input elements
-    const inputs = document.querySelectorAll('input');
+    const inputs = document.querySelectorAll('.form-input');
     // Initializes an object to hold table data
     const data = {}
     // Add the table name
@@ -29,18 +29,32 @@ function getTableData(){
     inputs.forEach(input => {
         let inputName = formatTableName(input.id);
         let val = input.value;
+         // Determine the value based on the element type
+         if (input.tagName.toLowerCase() === 'select') {
+            val = input.options[input.selectedIndex].textContent;
+        } else {
+            val = input.value;
+        }
         // Data is added
         data[inputName] = val;
     })
-    
     return data;
 }
 
 function clearInputs(){
-    const inputs = document.querySelectorAll('input');
-    inputs.forEach(input =>{
-        input.value = '';
-    })
+    const inputs = document.querySelectorAll('.form-input');
+    inputs.forEach(input => {
+        if (input.tagName.toLowerCase() === 'select') {
+            // Set the select to the NULL option
+            const nullOption = Array.from(input.options).find(option => option.value === '');
+            if (nullOption) {
+                input.value = '';
+            }
+        } else {
+            // Clear the input value
+            input.value = '';
+        }
+    });
 }
 
 function dynamicDropdown(){
@@ -112,7 +126,34 @@ updateButton.addEventListener("click", updateRow)
 function updateRow(event){
     /* */
     console.log(`== ${arguments.callee.name} called == `);
+    event.preventDefault();
+
+    // Get table data
+    const tableData = getTableData();
+    console.log("tableData from updateRow: ", tableData)
+
+    fetch(`/update-row`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(tableData)
+        })
+        .then(response => response.json())
+        .then( data => {
+            if (data.status) {
+                console.log("== Successfully Updated Row ==")
+                clearInputs();
+                location.reload();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error("Update row failed: ", error);
+        });
 }
+
 
 /* ====================================================================================
 FOCUS:
@@ -143,13 +184,12 @@ function createRow(event){
         })
         .then(response => response.json())
         .then( data => {
-            var status = data["status"];
-            if(status){
+            if(data["status"]){
                 console.log("== Successfully Created Row ==")
                 clearInputs();
                 location.reload();
             } else {
-                console.log(data.message)
+                alert('Error: ' + data.message);
             }
         })
         .catch(error => {
