@@ -5,7 +5,6 @@
 
         <tr>
             {{!-- Title --}}
-            {{!-- <th>{{idAttribute}}</th> --}}
             {{#each attributes}}
                 <th>{{this}}</th>
             {{/each}}
@@ -28,9 +27,9 @@
             {{/each}}
         </tr>
     </table>
-    <button type="submit" id="create-row-button">Create Row</button>
-    <button type="submit" id="update-row-button">Update Row</button>
-    <button type="submit" id="replace-table-button" class="replace-table-button">Replace Table Data</button>
+    <button class="crud" type="submit" id="create-row-button">Create {{buttonTitle}}</button>
+    <button class="crud" type="submit" id="update-row-button">Update existing {{buttonTitle}}</button>
+    <button class="crud replace-table-button" type="submit" id="replace-table-button" >Replace {{buttonTitle}} data</button>
 </form>
 
 {{#if search}}

@@ -87,6 +87,13 @@ const dropdownConfigs = {
     }
 };
 
+const buttonTitles = {
+    "Investors": "investor",
+    "Stocks": "stock",
+    "Changes": "change in stock",
+    "Investments": "investment",
+    "InvestedStocks": "invested-in-stock"
+}
 
 // function template: 
 /* ================================================
@@ -297,6 +304,7 @@ app.get("/", function(req, res) {
 
     })
 })
+
 app.get("/tables/:table", async function(req, res) {  // Mark the function as async
     const tableName = req.params.table;
     const table = tableName.charAt(0).toUpperCase() + tableName.slice(1);
@@ -325,7 +333,8 @@ app.get("/tables/:table", async function(req, res) {  // Mark the function as as
                     crudInputs: crudInputs,
                     inputs: values,
                     dograph: doGraphs[table],
-                    search: search[table]
+                    search: search[table],
+                    buttonTitle: buttonTitles[table]
                 });
             } catch (error) {
                 console.error("Error formatting data:", error);
