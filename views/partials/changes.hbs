@@ -1,0 +1,46 @@
+<!-- changes.hbs -->
+
+{{!-- Title --}}
+<h2>Changes Page</h2>
+
+{{!-- Create a table --}}
+<table>
+    {{!-- Header section --}}
+    <thead>
+        {{!-- For just the first row, we print each key of the row object as a header cell so we
+        know what each column means when the page renders --}}
+        <tr>
+            {{#each data.[0]}}
+            <th>
+                {{@key}}
+            </th>
+            {{/each}}
+        </tr>
+    </thead>
+
+    {{!-- Body section --}}
+    <tbody>
+        {{!-- Navigation Bar --}}
+        {{>navBar_editor}}
+
+        {{!-- For each row, print the investorID and name in order --}}
+        {{#each data}}
+        <tr>
+            <td>{{this.changeID}}</td>
+            <td>{{this.stockID}}</td>
+            <td>{{this.priceOpen}}</td>
+            <td>{{this.priceClose}}</td>
+            <td>{{this.priceHigh}}</td>
+            <td>{{this.priceLow}}</td>
+            <td>{{this.date}}</td>
+            <td>
+            {{!-- <button class="update-button">Update</button> --}}
+            <button class="delete-button">Delete</button>
+            </td>
+        </tr>
+        {{/each}}
+    </tbody>
+</table>
+
+{{!-- CRUD Form --}}
+{{>crudForm}}
