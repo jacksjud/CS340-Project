@@ -22,6 +22,10 @@ app.engine('handlebars', engine({ defaultLayout: "main" }))   // sets up templat
 app.set('view engine', 'handlebars')            // sets up view engine 
 app.set('views', './views')                     // registers where templates are
 
+//***SECURITY WARNING***
+const DEBUG = false;         //DEBUG -- Should always be set to false for production version
+                             //         gives additional error output to website (renders errors in .json)
+
 const dbTablePKs = {
     "Investors":"investorID",
     "Stocks":"stockID",
@@ -29,6 +33,15 @@ const dbTablePKs = {
     "Investments": "investID",
     "InvestedStocks": "investedStockID"
 }
+
+const dbPKsTables = {
+    "InvestorID": "Investors",
+    "StockID": "Stocks",
+    "ChangeID": "Changes",
+    "InvestID": "Investments",
+    "InvestedStockID": "InvestedStocks"
+};
+
 
 const doGraphs = {
     "Investors":false,
@@ -105,6 +118,23 @@ Desc:
 
 ================================================ */
 
+/* ================================================
+--------------------------------------------------- 
+Function:   
+===================================================
+
+Desc:
+
+================================================ */
+function formattedDate(){
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    // Formats month to always be 2 long (like january = 01)
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    // Formats day to always be 2 long (like february 1st = 01)
+    const dd = String(today.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+}
 
 
 
@@ -123,7 +153,7 @@ async function formatDropDownData(results, tableName, dropdownConfig) {
     // Helper function to fetch options for dropdowns
     const fetchOptions = async (attr) => {
         // Generates a select query based on an attribute and table name
-        const querySelect = generateSelectQuery(tableName, attr);
+        const querySelect = generateSelectQuery(dbPKsTables[attr], attr);
         // Attempts to get query from database
         try {
             const queryResults = await new Promise((resolve, reject) => {
@@ -154,6 +184,8 @@ async function formatDropDownData(results, tableName, dropdownConfig) {
             inputs[result] = {
                 attr: result,
                 isDropdown: isDD,
+                isDate: result === "Date",
+                dateVal: formattedDate(),
                 options: options
             };
         }
@@ -171,6 +203,8 @@ async function formatDropDownData(results, tableName, dropdownConfig) {
             inputs[result] = {
                 attr: result,
                 isDropdown: isDD,
+                isDate: result === "Date",
+                dateVal: formattedDate(),
                 options: options
             };
         // If the attribute doesn't need drop down info, just give options an empty arrary
@@ -179,6 +213,8 @@ async function formatDropDownData(results, tableName, dropdownConfig) {
             inputs[result] = {
                 attr: result,
                 isDropdown: isDD,
+                isDate: result === "Date",
+                dateVal: formattedDate(),
                 options: options
             };
         }
@@ -311,7 +347,15 @@ app.get("/tables/:table", async function(req, res) {  // Mark the function as as
     const querySelect = `SELECT * FROM ${table};`
 
     quick.connect.query(querySelect, async (error, results) => {  // Make the callback async
-        if (error) throw error;
+        if (error){
+            if (!DEBUG) { // If DEBUG is false, don't handle SQL error 
+                return;
+            }
+            // If DEBUG is true, log the error (makes sitre crash unless handled differently)
+            console.error("Invalid table name:", tableName);
+            res.status(404).send("Invalid table name");
+            throw error;
+        }
 
         if (results.length === 0) {
             res.render('editor', {
@@ -326,6 +370,7 @@ app.get("/tables/:table", async function(req, res) {  // Mark the function as as
 
             try {
                 const crudInputs = await formatDropDownData(keys, table, dropdownConfigs);  // Await the testFormatData call
+                console.log(crudInputs)
                 res.render('editor', {
                     body: "table",
                     title: table,

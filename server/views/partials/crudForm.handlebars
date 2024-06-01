@@ -12,15 +12,16 @@
         <tr>
             {{#each crudInputs}}
                 {{#if this.isDropdown}}
-                <td>
-                    <select class="form-input" id="{{this.attr}}">
-                        <option value="">NULL</option>
-                        {{#each this.options}}
-                            <option value="">{{this}}</option>
-                        {{/each}}
-                    </select>   
-                </td>
-                
+                    <td>
+                        <select class="form-input" id="{{this.attr}}">
+                            <option value="">NULL</option>
+                            {{#each this.options}}
+                                <option value="{{this}}">{{this}}</option>
+                            {{/each}}
+                        </select>   
+                    </td>
+                {{else if this.isDate}}
+                    <td><input class="form-input" type="date" id="{{@key}}" name="{{@key}}" value="{{this.dateVal}}"></td>
                 {{else}}
                     <td><input class="form-input" type="text" id="{{@key}}" name="{{@key}}"></td>
                 {{/if}}
