@@ -38,17 +38,18 @@
     - Make sure the databse follows the structure found in DDL.sql.
     - or use our DDL.sql as an example.
 
-5. **Run database migrations (if applicable)**:
-    ```sh
-    npm run migrate
-    ```
 
 ### Running the Application
 
 1. **Start the server**:
-    - Run Npm and start server
+    - Run Npm and start the server
     ```sh
     npm run dev
+    ```
+    - Or run Forever to start/stop the server
+    ```sh
+    forever start server.js
+    forever stop server.js
     ```
 
 

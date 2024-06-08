@@ -8,6 +8,4 @@ node_modules/
 .DS_Store
 
 # IDEs and editors
-.vscode/# Ignore all files named db-connector anywhere in the repository
-**/db-connector.js
-
+.vscode/
