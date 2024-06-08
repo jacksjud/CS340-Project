@@ -2,7 +2,6 @@ body {
     background-color: #EEEEEE;
 }
 
-
 /* Table and Row Styles */
 
 table {
@@ -79,6 +78,7 @@ button.crud {
 
 
 /* Navigation Bar Styles */
+
 nav {
     background-color: #333; /* Change the background color */
     padding: 10px; /* Add padding */
@@ -121,8 +121,8 @@ form {
     margin-bottom: 20px;
 }
 
-/* Buttons */
 
+/* ***Buttons*** */
 
 /* Delete button */
 

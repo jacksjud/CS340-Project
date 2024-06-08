@@ -6,7 +6,7 @@ INSERT IGNORE INTO Stocks (
     companyName
 )
 VALUES
-(1,'AAPL', 'Apple Inc.'),
+(1, 'AAPL', 'Apple Inc.'),
 (2, 'BA', 'The Boeing Company'),
 (3, 'NKE', 'NIKE, Inc.'),
 (4, 'SBUX', 'Starbucks Corporation'),

@@ -6,18 +6,23 @@
 /*
     SETUP
 */
+// Other
+const fs = require('fs');
+const bodyParser = require('body-parser');
+require('dotenv').config()
+
 // Get local hostname for URL
 const os = require('os');
 const hostname = os.hostname();
-
-// Favicon
-const favicon = require('serve-favicon');
-const path = require('path');
 
 // Express
 var express = require('express');   // We are using the express library for the web server
 var app     = express();            // We need to instantiate an express object to interact with the server in our code
 PORT        = 8108;                 // Set a port number at the top so it's easy to change in the future
+
+// Use the static middleware and don't serve directory index files
+app.use(express.static('static', { index: false }))
+app.use(bodyParser.json());
 
 // Handlebars :{
 const { engine } = require('express-handlebars');
@@ -25,43 +30,14 @@ app.engine('handlebars', engine({defaultLayout: "main" }))    // Sets up templat
 app.set('view engine', 'handlebars');                         // Tell express to use the handlebars engine whenever it encounters a *.hbs file.
 app.set('views', './views')                                   // Registers where templates are
 
-// Other
-const fs = require('fs');
-const bodyParser = require('body-parser');
-require('dotenv').config()
-
-// Use the static middleware and don't serve directory index files
-app.use(express.static('static', { index: false }))
-app.use(bodyParser.json());
-
-// Set the correct MIME type for CSS files
-app.use('*.css', (req, res, next) => {
-    res.header('Content-Type', 'text/css');
-    next();
-});
-
-// Set the correct MIME type for JavaScript files
-app.use('*.js', (req, res, next) => {
-    res.header('Content-Type', 'application/javascript');
-    next();
-});
-
 // Serve the favicon
+const favicon = require('serve-favicon');
+const path = require('path');
 app.use(favicon(path.join(__dirname, 'static/images', 'favicon.ico')));
-
-// Database
-const quick = require('./database/db-connector');
-quick.connect.connect((err) => {                // Establish the database connection
-    if (err) {
-        console.error('== Error connecting to database: ', err);
-        return;
-    }
-    console.log('== Connected to the database');
-});
 
 //***SECURITY WARNING***
 const DEBUG = false;         //DEBUG -- Should always be set to false for production version
-                             //         gives additional error output to website (renders errors in .json)
+                             //         gives additional error output to website
 
 
 // Configurations or mappings for different aspects of application
@@ -73,16 +49,18 @@ const dbTablePKs = {
     "InvestedStocks": "investedStockID"
 }
 
+const dbPKsTables = {
+    "InvestorID": "Investors",
+    "StockID": "Stocks",
+    "ChangeID": "Changes",
+    "InvestID": "Investments",
+    "InvestedStockID": "InvestedStocks"
+};
+
+
+
 const doGraphs = {
     "Investors":false,
-    "Stocks":true,
-    "Changes":true,
-    "Investments": true,
-    "InvestedStocks": false
-}
-
-const attributes = {
-    "Investors":true,
     "Stocks":true,
     "Changes":true,
     "Investments": true,
@@ -138,7 +116,26 @@ const buttonTitles = {
     "InvestedStocks": "invested-in-stock"
 }
 
+
 // Functions
+
+/* ================================================
+--------------------------------------------------- 
+Function:   formattedDate
+===================================================
+
+Desc: Formats the Dates to YYYY-MM-DD.
+
+================================================ */
+function formattedDate(){
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    // Formats month to always be 2 long (like january = 01)
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    // Formats day to always be 2 long (like february 1st = 01)
+    const dd = String(today.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+}
 
 /* ================================================
 --------------------------------------------------- 
@@ -151,11 +148,10 @@ menus.
 ================================================ */
 async function formatDropDownData(results, tableName, dropdownConfig) {
     const inputs = {};
-
     // Helper function to fetch options for dropdowns
     const fetchOptions = async (attr) => {
         // Generates a select query based on an attribute and table name
-        const querySelect = generateSelectQuery(tableName, attr);
+        const querySelect = generateSelectQuery(dbPKsTables[attr], attr);
         // Attempts to get query from database
         try {
             const queryResults = await new Promise((resolve, reject) => {
@@ -174,7 +170,6 @@ async function formatDropDownData(results, tableName, dropdownConfig) {
             return [];
         }
     };
-
     // Process specific attributes synchronously
     for (let result of results) {
         // Determine if the attribute needs a drop down display
@@ -186,11 +181,12 @@ async function formatDropDownData(results, tableName, dropdownConfig) {
             inputs[result] = {
                 attr: result,
                 isDropdown: isDD,
+                isDate: result === "Date",
+                dateVal: formattedDate(),
                 options: options
             };
         }
     }
-
     // Process the remaining attributes
     await Promise.all(results.map(async (result) => {
         // Determine if the attribute needs a drop down display
@@ -203,6 +199,8 @@ async function formatDropDownData(results, tableName, dropdownConfig) {
             inputs[result] = {
                 attr: result,
                 isDropdown: isDD,
+                isDate: result === "Date",
+                dateVal: formattedDate(),
                 options: options
             };
         // If the attribute doesn't need drop down info, just give options an empty arrary
@@ -211,11 +209,12 @@ async function formatDropDownData(results, tableName, dropdownConfig) {
             inputs[result] = {
                 attr: result,
                 isDropdown: isDD,
+                isDate: result === "Date",
+                dateVal: formattedDate(),
                 options: options
             };
         }
     }));
-
     return inputs;
 }
 
@@ -325,13 +324,24 @@ function generateInsertQuery(tableName, columns, values) {
 /*
     ROUTES
 */
+
+// Database
+const quick = require('./database/db-quick');
+quick.connect.connect((err) => {                // Establish the database connection
+    if (err) {
+        console.error('== Error connecting to database: ', err);
+        return;
+    }
+    console.log('== Connected to the database');
+});
+
 // Display index page
 app.get("/", function(req, res) {
     res.render('body')
 })
 
 // Display pages with their corresponding data
-app.get("/tables/:table", async function(req, res, next) {  // Mark the function as async
+app.get("/tables/:table", async function(req, res) {  // Mark the function as async
     const tableName = req.params.table;
     const table = tableName.charAt(0).toUpperCase() + tableName.slice(1);
     const querySelect = `SELECT * FROM ${table};`
@@ -346,7 +356,6 @@ app.get("/tables/:table", async function(req, res, next) {  // Mark the function
             res.status(404).send("Invalid table name");
             throw error;
         }
-
         if (results.length === 0) {
             res.render('editor', {
                 body: "table",
@@ -358,6 +367,7 @@ app.get("/tables/:table", async function(req, res, next) {  // Mark the function
             const values = Object.values(newObjects);
             try {
                 const crudInputs = await formatDropDownData(keys, table, dropdownConfigs);  // Await the testFormatData call
+                console.log(crudInputs)
                 res.render('editor', {
                     body: "table",
                     title: table,

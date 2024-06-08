@@ -1,5 +1,5 @@
 # Project Name
-[CS362] Software Engineering 2 - Final Project
+[CS340] Introduction to Databases - Final Project
 
 ## Local Setup
 
@@ -46,10 +46,11 @@
 ### Running the Application
 
 1. **Start the server**:
-    - Run Node and start server.js
+    - Run Npm and start server
     ```sh
-    node server.js
+    npm run dev
     ```
+
 
 2. **Access the application**:
     - Open your web browser and go to http://localhost:8108 (or whatever hostname your machine is configured to use).

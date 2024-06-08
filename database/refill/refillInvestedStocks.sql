@@ -1,6 +1,5 @@
 SET AUTOCOMMIT = 0;
 
-
 INSERT IGNORE INTO InvestedStocks (
     stockID,
     investID,

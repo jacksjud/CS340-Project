@@ -1,14 +1,13 @@
+// Group: 95
+// Team Members:
+// Gabriele Falchini
+// Judah Jackson
+
 document.addEventListener('DOMContentLoaded', function() {
     console.log("== DOM Content Loaded ==")
     dynamicDropdown();
     
 });
-
-if (performance.getEntriesByType("navigation")[0].type === "navigate") {
-    // This code will only run on the first load
-    // replaceAll();
-}
-
 
 function formatTableName(name){
     console.log(`== ${arguments.callee.name} called == `);
@@ -250,4 +249,3 @@ function replaceAll(){
             console.error("ERROR: ", error)
         })
 }
-

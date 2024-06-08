@@ -1,8 +1,7 @@
 var mysql = require('mysql')
 require('dotenv').config()
 
-// Create a 'connection pool' using the provided credentials
-var pool = mysql.createPool({
+var connect = mysql.createConnection({
     connectionLimit : 10,
     host            : process.env.HOST,
     user            : process.env.USERNAME,
@@ -11,5 +10,4 @@ var pool = mysql.createPool({
 })
 
 // Export it for use in our application
-module.exports.pool = pool;
-
+module.exports.connect = connect;
