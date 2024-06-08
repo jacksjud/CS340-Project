@@ -1,0 +1,172 @@
+body {
+    background-color: #EEEEEE;
+}
+
+/* Table and Row Styles */
+
+table {
+    border-collapse: collapse;
+    background-color: #FFFBF5;
+    width: 100%;
+}
+th, td {
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+}
+th {
+    background-color: #7895B2;
+}
+
+tr:nth-child(odd) {background-color: #F1F0E8}
+
+tr.view-row:hover {background-color: #AEBDCA;}
+
+/* CRUD form */
+
+select {
+
+  text-align: center;
+  letter-spacing: 1px;
+  text-decoration: none;
+
+  background: #FFFFFF;
+  cursor: pointer;
+  transition: ease-out 0.5s;
+  border: 2px solid #7895B2;
+  border-radius: 5px;
+  box-shadow: inset 0 0 0 0 #7895B2;
+}
+
+button.crud {
+    margin: 10px;
+    background-color: #FFFFFF;
+    border: 1px solid #7895B2;
+    border-radius: .5rem;
+    color: #111827;
+    font-family: ui-sans-serif,system-ui,-apple-system,system-ui,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
+    font-size: .875rem;
+    font-weight: 600;
+    line-height: 1rem;
+    padding: .75rem 1rem;
+    text-align: center;
+    -webkit-box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    cursor: pointer;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-user-select: none;
+    -ms-touch-action: manipulation;
+    touch-action: manipulation;
+  }
+  
+  button.crud:hover {
+    background-color: #f9fafb;
+  }
+  
+  button.crud:focus {
+    outline: 2px solid rgba(0,0,0,0.1);
+    outline-offset: 2px;
+  }
+  
+  button.crud:focus-visible {
+    -webkit-box-shadow: none;
+    box-shadow: none;
+  }
+  
+
+
+/* Navigation Bar Styles */
+
+nav {
+    background-color: #333; /* Change the background color */
+    padding: 10px; /* Add padding */
+    text-align: center; /* Center the links */
+}
+
+nav ul {
+    list-style-type: none; /* Remove default list styles */
+    margin: 0;
+    padding: 0;
+}
+
+nav ul li {
+    display: inline; /* Display list items horizontally */
+    
+}
+
+nav ul li:last-child {
+    margin-right: 0; /* Remove right margin for the last link */
+}
+
+nav ul li a {
+    color: white; /* Change link color */
+    text-decoration: none; /* Remove underline */
+    font-size: 18px; /* Adjust font size */
+    padding: 10px 20px; /* Add padding for button effect */
+
+    transition: background-color 0.3s, box-shadow 0.3s; /* Add transition for smooth hover effect */
+}
+
+nav ul li a:hover {
+    background-color: #555; /* Change background color on hover */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Add box shadow on hover */
+}
+
+
+/* Form Styles */
+form {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+
+/* ***Buttons*** */
+
+/* Delete button */
+
+.delete-button {
+    background-color: transparent;
+    position: relative;
+    border: none;
+}
+
+.delete-button::after {
+    content: 'delete';
+    position: absolute;
+    top: 50%;
+    left: 100%;
+    transform: translateY(-50%);
+    width: fit-content;
+    height: fit-content;
+    background-color: rgb(168, 7, 7);
+    padding: 4px 8px;
+    border-radius: 5px;
+    transition: .2s linear;
+    transition-delay: .2s;
+    color: white;
+    text-transform: uppercase;
+    font-size: 12px;
+    opacity: 0;
+    visibility: hidden;
+}
+
+.icon {
+    transform: scale(1.2);
+    transition: .2s linear;
+}
+
+.delete-button:hover > .icon {
+    transform: scale(1.5);
+}
+
+.delete-button:hover > .icon path {
+    fill: rgb(168, 7, 7);
+}
+
+.delete-button:hover::after {
+    visibility: visible;
+    opacity: 1;
+    left: 120%;
+}
