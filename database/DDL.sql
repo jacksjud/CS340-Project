@@ -1,6 +1,13 @@
+-- Group: 95
+-- Team Members:
+-- Judah Jackson
+-- Gabriele Falchini
+
+
 SET FOREIGN_KEY_CHECKS=0;
 SET AUTOCOMMIT = 0;
 
+-------------- INITIAL TABLE CREATION --------------
 
 CREATE OR REPLACE TABLE Investors (
     investorID int NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -8,7 +15,7 @@ CREATE OR REPLACE TABLE Investors (
 );
 
 CREATE OR REPLACE TABLE Stocks (
-    stockID int not NULL AUTO_INCREMENT PRIMARY KEY,
+    stockID int NOT NULL AUTO_INCREMENT PRIMARY KEY,
     symbol varchar(256) unique not NULL,
     companyName varchar(256) not NULL
 );
@@ -41,6 +48,7 @@ CREATE OR REPLACE TABLE InvestedStocks (
     FOREIGN KEY (investID) REFERENCES Investments(investID) ON DELETE CASCADE
 );
 
+-------------- SAMPLE DATA --------------
 
 INSERT INTO Stocks (
     symbol,
@@ -116,7 +124,25 @@ VALUES
 
 
 
-SHOW TABLES;
+---- DISABLED (remove from comments) if you want to keep tables for testing/grading. Simply here for convenience.
+---- Show all the beautiful data in it's entirety.
 
+-- SHOW TABLES;
+-- DESCRIBE Investors;
+-- SELECT * FROM Investors;
+-- DESCRIBE Stocks;
+-- SELECT * FROM Stocks;
+-- DESCRIBE Changes;
+-- SELECT * FROM Changes;
+-- DESCRIBE Investments;
+-- SELECT * FROM Investments;
+-- DESCRIBE InvestedStocks;
+-- SELECT * FROM InvestedStocks;
+
+---- Now delete all the beautiful data in it's entirety.
+
+-- DROP TABLE Investors, Stocks, Changes, Investments, InvestedStocks;
+
+SHOW TABLES;
 SET FOREIGN_KEY_CHECKS=1;
 COMMIT;

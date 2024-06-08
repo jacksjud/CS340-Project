@@ -53,4 +53,4 @@
 
 
 2. **Access the application**:
-    - Open your web browser and go to http://localhost:8108 (or whatever hostname your machine is configured to use).
+    - Open your web browser and go to http://localhost:8108 ('localhost' or whatever hostname your machine is configured to use).

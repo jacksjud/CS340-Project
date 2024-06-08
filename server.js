@@ -39,8 +39,19 @@ app.use(favicon(path.join(__dirname, 'static/images', 'favicon.ico')));
 const DEBUG = false;         //DEBUG -- Should always be set to false for production version
                              //         gives additional error output to website
 
+// Database
+const quick = require('./database/db-quick');
+quick.connect.connect((err) => {                // Establish the database connection
+    if (err) {
+        console.error('== Error connecting to database: ', err);
+        return;
+    }
+    console.log('== Connected to the database');
+});
+
 
 // Configurations or mappings for different aspects of application
+
 const dbTablePKs = {
     "Investors":"investorID",
     "Stocks":"stockID",
@@ -324,16 +335,6 @@ function generateInsertQuery(tableName, columns, values) {
 /*
     ROUTES
 */
-
-// Database
-const quick = require('./database/db-quick');
-quick.connect.connect((err) => {                // Establish the database connection
-    if (err) {
-        console.error('== Error connecting to database: ', err);
-        return;
-    }
-    console.log('== Connected to the database');
-});
 
 // Display index page
 app.get("/", function(req, res) {
