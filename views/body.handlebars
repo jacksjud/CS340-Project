@@ -11,4 +11,15 @@
   <li><a href="/tables/changes">View Changes</a></li>
   <li><a href="/tables/investments">View Investments</a></li>
   <li><a href="/tables/investedStocks">View Invested Stocks</a></li>
+  <button id="openButton">Open Power BI Link</button>
+
+    <script>
+        document.getElementById('openButton').addEventListener('click', function() {
+            // Define the Power BI link
+            const powerBILink = 'https://app.powerbi.com/groups/me/reports/b9d1643d-e0a2-4c66-892a-66cc3f7792aa/f74afe0416caad37c88d?bookmarkGuid=4dea205b-6b16-4abe-ae30-71357c995433&bookmarkUsage=1&ctid=ce6d05e1-3c5e-4d62-87a8-4c4a2713c113&portalSessionId=e4439b07-7fbe-492b-9bdd-956159263c7c&fromEntryPoint=export';
+
+            // Open the Power BI link in a new window
+            window.open(powerBILink, '_blank');
+        });
+    </script>
 </ul>

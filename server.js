@@ -41,6 +41,7 @@ const DEBUG = false;         //DEBUG -- Should always be set to false for produc
 
 // Database
 const quick = require('./database/db-quick');
+const { getRandomValues } = require('crypto');
 quick.connect.connect((err) => {                // Establish the database connection
     if (err) {
         console.error('== Error connecting to database: ', err);
@@ -67,8 +68,6 @@ const dbPKsTables = {
     "InvestID": "Investments",
     "InvestedStockID": "InvestedStocks"
 };
-
-
 
 const doGraphs = {
     "Investors":false,
@@ -464,6 +463,46 @@ app.get("/replace-table/all", function(req, res) {
     console.log("== All Tables Replaced Successfully");
     res.json({ status: true, message: "Successfully repopulated all tables"});
 });
+
+// // Endpoint to export tables as CSV
+// app.get('/api/export', async (req, res) => {
+//     const { table } = req.query;
+    
+//     try {
+//         // Check if the specified table exists in exportTables object
+//         if (!(table in exportTables)) {
+//             return res.status(400).json({ error: 'Table not found' });
+//         }
+
+//         const columns = Object.keys(exportTables[table]).filter(column => exportTables[table][column]);
+
+//         if (columns.length === 0) {
+//             return res.status(400).json({ error: 'No columns selected for export' });
+//         }
+
+//         // Generate select query based on the table name and its columns
+//         const querySelect = generateSelectQuery(table, columns.join(', '));
+
+//         // Query the database to fetch data for the specified table
+//         quick.connect.query(querySelect, async (error, results) => {
+//             if (error) {
+//                 console.error(`Error fetching data for ${table}:`, error);
+//                 return res.status(500).json({ error: 'Internal server error' });
+//             }
+
+//             // Convert data to CSV format
+//             const csvData = results.map(row => columns.map(column => row[column]).join(',')).join('\n');
+
+//             // Set response headers for CSV download
+//             res.header('Content-Type', 'text/csv');
+//             res.attachment(`${table}.csv`);
+//             res.send(csvData);
+//         });
+//     } catch (error) {
+//         console.error(`Error exporting ${table}:`, error);
+//         res.status(500).json({ error: 'Internal server error' });
+//     }
+// });
 
 app.post("/create-table", (req, res) => {
     const tableData = (req.body);

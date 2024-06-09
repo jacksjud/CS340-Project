@@ -14,22 +14,20 @@ th, td {
     text-align: left;
     padding: 8px;
 }
-th {
+tr.column-headers{
     background-color: #7895B2;
 }
 
-tr:nth-child(odd) {background-color: #F1F0E8}
+tr.view-row:nth-child(odd) {background-color: #F1F0E8}
 
 tr.view-row:hover {background-color: #AEBDCA;}
 
 /* CRUD form */
 
 select {
-
   text-align: center;
   letter-spacing: 1px;
   text-decoration: none;
-
   background: #FFFFFF;
   cursor: pointer;
   transition: ease-out 0.5s;

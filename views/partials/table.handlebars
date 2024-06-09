@@ -7,10 +7,11 @@
 
 <table>
     {{!-- This would be the first row that would have the names of the attributes (potentially could be mixed with below) --}}
-    <tr>
+    <tr class="column-headers">
         {{#each attributes}}
             <th>{{this}}</th>
         {{/each}}
+        <th> <button id="exportButton">Export CSV</button> </th>
     </tr>
 
     {{!-- This would be the input data, like dummy data in the DB for example. --}}

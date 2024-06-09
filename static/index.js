@@ -9,6 +9,14 @@ document.addEventListener('DOMContentLoaded', function() {
     
 });
 
+// // Add event listener to export button
+// document.getElementById('exportButton').addEventListener('click', async () => {
+//     // Import the exportTables object from server.js
+//     const selectedTable = document.querySelector('h1').textContent;
+//     await exportCSV(selectedTable);
+//     console.log("== Exporting CSV of "+selectedTable+" ==")
+// });
+
 function formatTableName(name){
     console.log(`== ${arguments.callee.name} called == `);
     let newName = name.charAt(0).toLowerCase()
@@ -80,7 +88,6 @@ FOCUS:
 
 deleteButtons -
 ==================================================================================== */ 
-
 const deleteButtons = document.querySelectorAll(".delete-button");
 
 deleteButtons.forEach(button => {
@@ -159,7 +166,6 @@ FOCUS:
 
 createButton -
 ==================================================================================== */ 
-
 const createButton = document.getElementById("create-row-button");
 createButton.addEventListener("click", createRow)
 
@@ -201,7 +207,6 @@ FOCUS:
 
 replaceButton -
 ==================================================================================== */ 
-
 const replaceButton = document.querySelectorAll("#replace-table-button");
 replaceButton.forEach(button => {
     button.addEventListener('click', replaceTables);
@@ -231,8 +236,6 @@ FOCUS:
 
 replaceAll -
 ==================================================================================== */ 
-
-
 function replaceAll(){
     console.log(`== ${arguments.callee.name} called == `);
     fetch("/replace-table/all")
@@ -249,3 +252,48 @@ function replaceAll(){
             console.error("ERROR: ", error)
         })
 }
+
+// /* ====================================================================================
+// FOCUS:
+
+// exportCSV -
+// ==================================================================================== */ 
+// // Function to handle CSV export
+// async function exportCSV(selectedTable) {
+//     try {
+//         // Check if a table is selected
+//         if (!selectedTable) {
+//             throw new Error('No table selected');
+//         }
+//         // Construct columns string for the selected table
+//         const columns = Object.keys(window.exportTables[selectedTable]).join(', ');
+
+//         // Make a request to the server to export the CSV file for the selected table
+//         const response = await fetch(`/api/export?table=${selectedTable}&columns=${columns}`);
+
+//         // Check if the response is successful
+//         if (!response.ok) {
+//             throw new Error('Export failed');
+//         }
+
+//         // Extract filename from content-disposition header
+//         const disposition = response.headers.get('content-disposition');
+//         const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+//         const matches = filenameRegex.exec(disposition);
+//         const filename = matches != null && matches[1] ? matches[1].replace(/['"]/g, '') : 'export.csv';
+
+//         // Convert the response to a blob
+//         const blob = await response.blob();
+
+//         // Create a temporary link element to trigger the download
+//         const link = document.createElement('a');
+//         link.href = window.URL.createObjectURL(blob);
+//         link.download = filename;
+//         document.body.appendChild(link);
+//         link.click();
+//         document.body.removeChild(link);
+//     } catch (error) {
+//         console.error('Export failed:', error);
+//         // Handle error
+//     }
+// }

@@ -42,11 +42,11 @@
 ### Running the Application
 
 1. **Start the server**:
-    - Run Npm and start the server
+    - Run Npm and start the server in Developer Version.
     ```sh
     npm run dev
     ```
-    - Or run Forever to start/stop the server
+    - Or run Forever to start/stop the server for Production Version.
     ```sh
     forever start server.js
     forever stop server.js
